@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { v4 as uuidv4 } from 'uuid';
 import { User } from "./interfaces/user.interface";
-import { CreateUserDto } from "./dto/user.dto";
+import { CreateUserDto } from "./dto/createUser.dto";
 
 
 @Injectable({})
@@ -27,6 +27,21 @@ export class UserService {
     this.users = [...this.users, newUser];
 
     return newUser;
+  }
+
+  updateUserPassword(userToChange: User, newPassword: string): User {
+    const updatedUser = userToChange;
+    updatedUser.password = newPassword;
+    updatedUser.version = userToChange.version + 1;
+    updatedUser.updatedAt = new Date().getTime();
+    this.users = this.users.map((user) => {
+      if(user.id === updatedUser.id) {
+        return updatedUser;
+      }
+      return user;
+    });
+
+    return updatedUser;
   }
 
   deleteUser(id: string): void {
