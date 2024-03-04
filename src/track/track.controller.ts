@@ -1,5 +1,5 @@
-import { Controller, Get } from "@nestjs/common";
-import { TrackService } from "./track.service";
+import { Controller, Get } from '@nestjs/common';
+import { TrackService } from './track.service';
 
 @Controller('track')
 export class TrackController {
@@ -7,6 +7,6 @@ export class TrackController {
 
   @Get()
   getTracks(): string {
-    return this.trackService.getTracks()
+    return this.trackService.getTracks();
   }
 }

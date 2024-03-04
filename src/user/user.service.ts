@@ -1,19 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from "./interfaces/user.interface";
-import { CreateUserDto } from "./dto/createUser.dto";
-
+import { User } from './interfaces/user.interface';
+import { CreateUserDto } from './dto/createUser.dto';
 
 @Injectable({})
 export class UserService {
   private users: User[] = [];
 
   getUsers(): User[] {
-    return this.users
+    return this.users;
   }
 
   findUser(id: string): User | undefined {
-    return this.users.find((user: User) => user.id === id)
+    return this.users.find((user: User) => user.id === id);
   }
 
   createUser(userDto: CreateUserDto): User {
@@ -35,7 +34,7 @@ export class UserService {
     updatedUser.version = userToChange.version + 1;
     updatedUser.updatedAt = new Date().getTime();
     this.users = this.users.map((user) => {
-      if(user.id === updatedUser.id) {
+      if (user.id === updatedUser.id) {
         return updatedUser;
       }
       return user;
@@ -45,6 +44,6 @@ export class UserService {
   }
 
   deleteUser(id: string): void {
-    this.users = this.users.filter((user: User) => user.id !== id)
+    this.users = this.users.filter((user: User) => user.id !== id);
   }
 }

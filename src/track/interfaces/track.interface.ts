@@ -1,7 +1,7 @@
 interface Track {
-  id: string; 
+  id: string;
   name: string;
   artistId: string | null;
-  albumId: string | null; 
-  duration: number; 
+  albumId: string | null;
+  duration: number;
 }

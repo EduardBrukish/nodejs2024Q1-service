@@ -1,5 +1,5 @@
-import { Controller, Get } from "@nestjs/common";
-import { FavoritesService } from "./favorites.service";
+import { Controller, Get } from '@nestjs/common';
+import { FavoritesService } from './favorites.service';
 
 @Controller('favs')
 export class FavoritesController {
@@ -7,6 +7,6 @@ export class FavoritesController {
 
   @Get()
   getFavorites(): string {
-    return this.favoritesService.getFavorites()
+    return this.favoritesService.getFavorites();
   }
 }

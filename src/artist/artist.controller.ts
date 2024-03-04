@@ -1,5 +1,5 @@
-import { Controller, Get } from "@nestjs/common";
-import { ArtistService } from "./artist.service";
+import { Controller, Get } from '@nestjs/common';
+import { ArtistService } from './artist.service';
 
 @Controller('artist')
 export class ArtistController {
@@ -7,6 +7,6 @@ export class ArtistController {
 
   @Get()
   getArtists(): string {
-    return this.artistService.getArtists()
+    return this.artistService.getArtists();
   }
 }

@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
-@Injectable({}) 
+@Injectable({})
 export class TrackService {
   getTracks(): string {
-    return 'Now you have all tracks'
+    return 'Now you have all tracks';
   }
 }

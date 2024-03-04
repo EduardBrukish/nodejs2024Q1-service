@@ -1,9 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
 @Injectable({})
-
 export class FavoritesService {
   getFavorites(): string {
-    return 'Now you have all favorites albums'
+    return 'Now you have all favorites albums';
   }
 }
