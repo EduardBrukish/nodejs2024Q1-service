@@ -25,12 +25,15 @@ export class UserService {
     newUser.updatedAt = new Date().getTime();
     this.users = [...this.users, newUser];
 
-    const { password, ...userToReturn } = newUser
+    const { password, ...userToReturn } = newUser;
 
     return userToReturn;
   }
 
-  updateUserPassword(userToChange: User, newPassword: string): UserWithoutPassword {
+  updateUserPassword(
+    userToChange: User,
+    newPassword: string,
+  ): UserWithoutPassword {
     const updatedUser = userToChange;
     updatedUser.password = newPassword;
     updatedUser.version = userToChange.version + 1;
@@ -42,7 +45,7 @@ export class UserService {
       return user;
     });
 
-    const { password, ...userToReturn } = updatedUser
+    const { password, ...userToReturn } = updatedUser;
 
     return userToReturn;
   }

@@ -50,7 +50,7 @@ export class UserController {
   @Put(':id')
   @UsePipes(new ValidationPipe())
   updateUserPassword(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
   ): UserWithoutPassword {
     const user = this.userService.findUser(id);
