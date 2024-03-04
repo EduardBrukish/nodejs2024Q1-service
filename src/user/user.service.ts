@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from './interfaces/user.interface';
+import { User, UserWithoutPassword } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 
 @Injectable({})
@@ -15,7 +15,7 @@ export class UserService {
     return this.users.find((user: User) => user.id === id);
   }
 
-  createUser(userDto: CreateUserDto): User {
+  createUser(userDto: CreateUserDto): UserWithoutPassword {
     const newUser = {} as User;
     newUser.id = uuidv4();
     newUser.login = userDto.login;
@@ -25,10 +25,12 @@ export class UserService {
     newUser.updatedAt = new Date().getTime();
     this.users = [...this.users, newUser];
 
-    return newUser;
+    const { password, ...userToReturn } = newUser
+
+    return userToReturn;
   }
 
-  updateUserPassword(userToChange: User, newPassword: string): User {
+  updateUserPassword(userToChange: User, newPassword: string): UserWithoutPassword {
     const updatedUser = userToChange;
     updatedUser.password = newPassword;
     updatedUser.version = userToChange.version + 1;
@@ -40,7 +42,9 @@ export class UserService {
       return user;
     });
 
-    return updatedUser;
+    const { password, ...userToReturn } = updatedUser
+
+    return userToReturn;
   }
 
   deleteUser(id: string): void {

@@ -9,12 +9,13 @@ import {
   Post,
   Put,
   HttpException,
+  HttpCode,
   HttpStatus,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
-import { User } from './interfaces/user.interface';
+import { User, UserWithoutPassword } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
@@ -40,17 +41,18 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body() createUserDto: CreateUserDto): User {
+  @HttpCode(HttpStatus.CREATED)
+  createUser(@Body() createUserDto: CreateUserDto): UserWithoutPassword {
     const newUser = this.userService.createUser(createUserDto);
     return newUser;
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(new ValidationPipe())
   updateUserPassword(
     @Param('id') id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
-  ): User {
+  ): UserWithoutPassword {
     const user = this.userService.findUser(id);
 
     if (!user) {
@@ -69,6 +71,7 @@ export class UserController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   deleteUser(@Param('id') id: string): string {
     const user = this.userService.findUser(id);
