@@ -13,3 +13,5 @@ export interface FavoritesResponse {
   albums: Album[];
   tracks: Track[];
 }
+
+export type FavoriteCategories = 'albums' | 'artists' | 'tracks';
