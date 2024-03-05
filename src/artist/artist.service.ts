@@ -1,10 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Artist } from './interfaces/artist.interface';
 import { ArtistDto } from './dto/artist.dto';
+import { AlbumService } from '../album/album.service';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class ArtistService {
+  constructor(
+    @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
+  ) {}
+
   private artists: Artist[] = [];
 
   getArtists(): Artist[] {
@@ -40,6 +47,8 @@ export class ArtistService {
   }
 
   deleteArtist(id) {
+    this.albumService.removeArtistDataFromAlbum(id);
+    this.trackService.removeArtistDataFromTrack(id);
     this.artists = this.artists.filter((artist) => artist.id !== id);
   }
 }

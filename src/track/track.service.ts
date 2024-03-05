@@ -50,4 +50,22 @@ export class TrackService {
   deleteTrack(id: string) {
     this.tracks = this.tracks.filter((track) => track.id !== id);
   }
+
+  removeArtistDataFromTrack(artistId: string) {
+    this.tracks = this.tracks.map((track) => {
+      if(track.artistId === artistId) {
+        return {...track, artistId: null}
+      }
+      return track
+    })
+  }
+
+  removeAlbumDataFromTrack(albumId: string) {
+    this.tracks = this.tracks.map((track) => {
+      if(track.albumId === albumId) {
+        return {...track, albumId: null}
+      }
+      return track
+    })
+  }
 }
