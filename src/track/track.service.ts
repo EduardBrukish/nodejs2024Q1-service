@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Track } from './interfaces/track.interface';
 import { TrackDto } from './dto/track.dto';
 
-@Injectable({})
+@Injectable()
 export class TrackService {
   private tracks: Track[] = [];
 

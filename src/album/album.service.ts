@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Album } from './interfaces/album.interface';
 import { AlbumDto } from './dto/album.dto';
 
-@Injectable({})
+@Injectable()
 export class AlbumService {
   private albums: Album[] = [];
 

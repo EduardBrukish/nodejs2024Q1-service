@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Artist } from './interfaces/artist.interface';
 import { ArtistDto } from './dto/artist.dto';
 
-@Injectable({})
+@Injectable()
 export class ArtistService {
   private artists: Artist[] = [];
 
