@@ -22,7 +22,6 @@ import {
   ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { ArtistService } from './artist.service';
-import { Artist } from './interfaces/artist.interface';
 import { CommonNotFoundException } from 'src/exception/not-found.exception';
 import { ArtistDto, ArtistResponseDto } from './dto/artist.dto';
 
@@ -79,7 +78,7 @@ export class ArtistController {
   updateArtist(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: ArtistDto,
-  ): Artist {
+  ): ArtistResponseDto {
     const artist = this.artistService.findArtist(id);
 
     if (!artist) {

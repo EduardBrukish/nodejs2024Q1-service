@@ -1,9 +1,9 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import {
   Favorites,
-  FavoritesResponse,
   FavoriteCategories,
 } from './interfaces/favorites.interface';
+import { FavoritesResponseDto } from './dto/favorites.dto'
 import { TrackService } from '../track/track.service';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
@@ -23,7 +23,7 @@ export class FavoritesService {
     tracks: [],
   };
 
-  getFavorites(): FavoritesResponse {
+  getFavorites(): FavoritesResponseDto {
     const favoritesTracks = this.favs.tracks
       .map((trackId) => this.trackService.findTrack(trackId))
       .filter((track) => Boolean(track));

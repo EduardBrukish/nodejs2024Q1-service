@@ -1,7 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Artist } from './interfaces/artist.interface';
-import { ArtistDto } from './dto/artist.dto';
+import { ArtistDto, ArtistResponseDto } from './dto/artist.dto';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
 
@@ -12,18 +11,18 @@ export class ArtistService {
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
   ) {}
 
-  private artists: Artist[] = [];
+  private artists: ArtistResponseDto[] = [];
 
-  getArtists(): Artist[] {
+  getArtists(): ArtistResponseDto[] {
     return this.artists;
   }
 
-  findArtist(id): Artist {
+  findArtist(id): ArtistResponseDto {
     return this.artists.find((artist) => artist.id === id);
   }
 
-  createArtist(artistDto: ArtistDto): Artist {
-    const newArtist = {} as Artist;
+  createArtist(artistDto: ArtistDto): ArtistResponseDto {
+    const newArtist = {} as ArtistResponseDto;
 
     newArtist.id = uuidv4();
     newArtist.name = artistDto.name;
@@ -34,7 +33,7 @@ export class ArtistService {
     return newArtist;
   }
 
-  updateArtist(artistToUpdate: Artist, artistDto: ArtistDto): Artist {
+  updateArtist(artistToUpdate: ArtistResponseDto, artistDto: ArtistDto): ArtistResponseDto {
     const updatedArtist = Object.assign({}, artistToUpdate);
     updatedArtist.name = artistDto.name;
     updatedArtist.grammy = artistDto.grammy ?? false;

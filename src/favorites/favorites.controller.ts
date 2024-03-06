@@ -10,10 +10,18 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiUnprocessableEntityResponse
+} from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
 import { TrackService } from '../track/track.service';
-import { FavoritesResponse } from './interfaces/favorites.interface';
+import { FavoritesResponseDto } from './dto/favorites.dto'
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
@@ -29,11 +37,15 @@ export class FavoritesController {
   ) {}
 
   @Get()
-  getFavorites(): FavoritesResponse {
+  @ApiOkResponse({ type: [FavoritesResponseDto] })
+  getFavorites(): FavoritesResponseDto {
     return this.favoritesService.getFavorites();
   }
 
   @Post('track/:id')
+  @ApiCreatedResponse({ description: 'The track was successfully added to the favorites.' })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiUnprocessableEntityResponse({ description: 'Track with ID ${id} does not exist' })
   @UsePipes(ParseUUIDPipe)
   addFavoriteTrack(@Param('id') id: string): string {
     const track = this.trackService.findTrack(id);
@@ -50,6 +62,11 @@ export class FavoritesController {
   }
 
   @Delete('track/:id')
+  @ApiNoContentResponse({
+    description: 'Track with ID ${id} was deleted from favorites',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({ description: 'Track with ID ${id} not found in favorites' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   removeFavoriteTrack(@Param('id') id: string): string {
@@ -68,6 +85,9 @@ export class FavoritesController {
   }
 
   @Post('album/:id')
+  @ApiCreatedResponse({ description: 'The album was successfully added to the favorites.' })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiUnprocessableEntityResponse({ description: 'Album with ID ${id} does not exist' })
   @UsePipes(ParseUUIDPipe)
   addFavoriteAlbum(@Param('id') id: string): string {
     const categoryItemId = this.albumService.findAlbum(id);
@@ -84,6 +104,11 @@ export class FavoritesController {
   }
 
   @Delete('album/:id')
+  @ApiNoContentResponse({
+    description: 'Album with ID ${id} was deleted from favorites',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({ description: 'Album with ID ${id} not found in favorites' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   removeFavoriteAlbum(@Param('id') id: string): string {
@@ -102,6 +127,9 @@ export class FavoritesController {
   }
 
   @Post('artist/:id')
+  @ApiCreatedResponse({ description: 'The artist was successfully added to the favorites.' })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiUnprocessableEntityResponse({ description: 'Artist with ID ${id} does not exist' })
   @UsePipes(ParseUUIDPipe)
   addFavoriteArtist(@Param('id') id: string): string {
     const artist = this.artistService.findArtist(id);
@@ -118,6 +146,11 @@ export class FavoritesController {
   }
 
   @Delete('artist/:id')
+  @ApiNoContentResponse({
+    description: 'Artist with ID ${id} was deleted from favorites',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found in favorites' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   removeFavoriteArtist(@Param('id') id: string): string {
