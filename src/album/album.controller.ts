@@ -12,23 +12,38 @@ import {
   Body,
   ValidationPipe,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { AlbumService } from './album.service';
-import { Album } from './interfaces/album.interface';
 import { CommonNotFoundException } from '../exception/not-found.exception';
-import { AlbumDto } from './dto/album.dto';
+import { AlbumDto, AlbumResponseDto } from './dto/album.dto';
 
+@ApiTags('album')
 @Controller('album')
 export class AlbumController {
   constructor(private albumService: AlbumService) {}
 
   @Get()
-  getAlbums(): Album[] {
+  @ApiOperation({ summary: 'Get all albums' })
+  @ApiOkResponse({ type: [AlbumResponseDto] })
+  getAlbums(): AlbumResponseDto[] {
     return this.albumService.getAlbums();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get album by id' })
+  @ApiOkResponse({ type: AlbumResponseDto })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({ description: 'Album with ID ${id} not found' })
   @UsePipes(ParseUUIDPipe)
-  getAlbum(@Param('id') id: string): Album {
+  getAlbum(@Param('id') id: string): AlbumResponseDto {
     const album = this.albumService.findAlbum(id);
 
     if (!album) {
@@ -39,19 +54,32 @@ export class AlbumController {
   }
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'The artist has been successfully created.',
+    type: AlbumResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Request body does not contain required fields',
+  })
   @HttpCode(HttpStatus.CREATED)
-  createAlbum(@Body() albumDto: AlbumDto): Album {
+  createAlbum(@Body() albumDto: AlbumDto): AlbumResponseDto {
     const newAlbum = this.albumService.createAlbum(albumDto);
 
     return newAlbum;
   }
 
   @Put(':id')
+  @ApiOkResponse({
+    description: 'The album data has been successfully updated.',
+    type: AlbumResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({ description: 'Album with ID ${id} not found' })
   @UsePipes(new ValidationPipe())
   updateAlbum(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() albumDto: AlbumDto,
-  ): Album {
+  ): AlbumResponseDto {
     const album = this.albumService.findAlbum(id);
 
     if (!album) {
@@ -62,6 +90,11 @@ export class AlbumController {
   }
 
   @Delete(':id')
+  @ApiNoContentResponse({
+    description: 'Album with ID ${id} was deleted successfully',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({ description: 'Album with ID ${id} not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   deleteAlbum(@Param('id') id: string): string {

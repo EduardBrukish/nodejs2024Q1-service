@@ -1,7 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Album } from './interfaces/album.interface';
-import { AlbumDto } from './dto/album.dto';
+import { AlbumDto, AlbumResponseDto } from './dto/album.dto';
 import { TrackService } from '../track/track.service';
 
 @Injectable()
@@ -10,18 +9,18 @@ export class AlbumService {
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
   ) {}
 
-  private albums: Album[] = [];
+  private albums: AlbumResponseDto[] = [];
 
-  getAlbums(): Album[] {
+  getAlbums(): AlbumResponseDto[] {
     return this.albums;
   }
 
-  findAlbum(id): Album {
+  findAlbum(id): AlbumResponseDto {
     return this.albums.find((album) => album.id === id);
   }
 
-  createAlbum(albumDto: AlbumDto): Album {
-    const newAlbum = {} as Album;
+  createAlbum(albumDto: AlbumDto): AlbumResponseDto {
+    const newAlbum = {} as AlbumResponseDto;
 
     newAlbum.id = uuidv4();
     newAlbum.name = albumDto.name;
@@ -33,7 +32,10 @@ export class AlbumService {
     return newAlbum;
   }
 
-  updateAlbum(albumToUpdate: Album, albumDto: AlbumDto): Album {
+  updateAlbum(
+    albumToUpdate: AlbumResponseDto,
+    albumDto: AlbumDto,
+  ): AlbumResponseDto {
     const updatedAlbum = Object.assign({}, albumToUpdate);
     updatedAlbum.name = albumDto.name;
     updatedAlbum.year = albumDto.year;

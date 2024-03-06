@@ -57,11 +57,12 @@ export class ArtistController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({
-    description: 'The artist has been successfully updated.',
+    description: 'The artist has been successfully created.',
     type: ArtistResponseDto,
   })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })
+  @ApiBadRequestResponse({
+    description: 'Request body does not contain required fields',
+  })
   createArtist(@Body() artistDto: ArtistDto): ArtistResponseDto {
     const newArtist = this.artistService.createArtist(artistDto);
     return newArtist;
@@ -90,10 +91,10 @@ export class ArtistController {
 
   @Delete(':id')
   @ApiNoContentResponse({
-    description: 'User with ID ${id} was deleted successfully',
+    description: 'Artist with ID ${id} was deleted successfully',
   })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiNotFoundResponse({ description: 'User with ID ${id} not found' })
+  @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   deleteArtist(@Param('id') id: string): string {
@@ -105,6 +106,6 @@ export class ArtistController {
 
     this.artistService.deleteArtist(id);
 
-    return `User with ID ${id} was deleted successfully`;
+    return `Artist with ID ${id} was deleted successfully`;
   }
 }
