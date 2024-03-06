@@ -39,7 +39,7 @@ export class ArtistController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by id' })
+  @ApiOperation({ summary: 'Get artist by id' })
   @ApiOkResponse({ type: ArtistResponseDto })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })

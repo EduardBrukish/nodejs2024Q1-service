@@ -1,22 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Track } from './interfaces/track.interface';
-import { TrackDto } from './dto/track.dto';
+import { TrackDto, TrackResponseDto } from './dto/track.dto';
 
 @Injectable()
 export class TrackService {
-  private tracks: Track[] = [];
+  private tracks: TrackResponseDto[] = [];
 
-  getTracks(): Track[] {
+  getTracks(): TrackResponseDto[] {
     return this.tracks;
   }
 
-  findTrack(id: string): Track | undefined {
+  findTrack(id: string): TrackResponseDto | undefined {
     return this.tracks.find((track) => track.id === id);
   }
 
-  createTrack(trackDto: TrackDto): Track {
-    const newTrack = {} as Track;
+  createTrack(trackDto: TrackDto): TrackResponseDto {
+    const newTrack = {} as TrackResponseDto;
     newTrack.id = uuidv4();
     newTrack.name = trackDto.name;
     newTrack.albumId = trackDto.albumId ?? null;
@@ -28,7 +27,7 @@ export class TrackService {
     return newTrack;
   }
 
-  updateTrack(track: Track, trackDto: TrackDto): Track {
+  updateTrack(track: TrackResponseDto, trackDto: TrackDto): TrackResponseDto {
     const clonedTrack = Object.assign({}, track);
     clonedTrack.name = trackDto.name;
     clonedTrack.albumId = trackDto.albumId || track.albumId;

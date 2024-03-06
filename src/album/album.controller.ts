@@ -25,7 +25,7 @@ import { AlbumService } from './album.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
 import { AlbumDto, AlbumResponseDto } from './dto/album.dto';
 
-@ApiTags('album')
+@ApiTags('Album')
 @Controller('album')
 export class AlbumController {
   constructor(private albumService: AlbumService) {}
