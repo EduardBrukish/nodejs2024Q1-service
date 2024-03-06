@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
 import { TrackService } from '../track/track.service';
 import { FavoritesResponse } from './interfaces/favorites.interface';
@@ -17,6 +18,7 @@ import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
 
+@ApiTags('Favorites')
 @Controller('favs')
 export class FavoritesController {
   constructor(

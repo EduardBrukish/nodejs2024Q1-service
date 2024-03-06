@@ -13,22 +13,31 @@ import {
   HttpStatus,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiNotFoundResponse, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
-import { User, UserWithoutPassword } from './interfaces/user.interface';
+import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiOkResponse({ type: [UserDto] })
   getUsers(): User[] {
     return this.userService.getUsers();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiOkResponse({ description: 'The record has been successfully created.', type: UserDto })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({description: 'User with ID ${id} not found'})
   @UsePipes(ParseUUIDPipe)
   getUser(@Param('id') id: string): User {
     const user = this.userService.findUser(id);
@@ -41,18 +50,24 @@ export class UserController {
   }
 
   @Post()
+  @ApiCreatedResponse({ description: 'The user has been successfully created.', type: UserDto})
+  @ApiBadRequestResponse({ description: 'Body does not contain required fields' })
   @HttpCode(HttpStatus.CREATED)
-  createUser(@Body() createUserDto: CreateUserDto): UserWithoutPassword {
+  createUser(@Body() createUserDto: CreateUserDto): UserDto {
     const newUser = this.userService.createUser(createUserDto);
     return newUser;
   }
 
   @Put(':id')
+  @ApiOkResponse({ description: 'The record has been successfully updated.', type: UserDto })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({description: 'User with ID ${id} not found'})
+  @ApiForbiddenResponse ({description: 'Wrong user password'})
   @UsePipes(new ValidationPipe())
   updateUserPassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
-  ): UserWithoutPassword {
+  ): UserDto {
     const user = this.userService.findUser(id);
 
     if (!user) {
@@ -71,6 +86,9 @@ export class UserController {
   }
 
   @Delete(':id')
+  @ApiNoContentResponse({ description: 'User with ID ${id} was deleted successfully'})
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiNotFoundResponse({description: 'User with ID ${id} not found'})
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   deleteUser(@Param('id') id: string): string {

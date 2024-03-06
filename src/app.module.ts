@@ -10,12 +10,12 @@ import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, }),
     UserModule,
     ArtistModule,
     TrackModule,
     AlbumModule,
     FavoritesModule,
+    ConfigModule.forRoot({ isGlobal: true, }),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,11 +12,13 @@ import {
   Body,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ArtistService } from './artist.service';
 import { Artist } from './interfaces/artist.interface';
 import { CommonNotFoundException } from 'src/exception/not-found.exception';
 import { ArtistDto } from './dto/artist.dto';
 
+@ApiTags('Artist')
 @Controller('artist')
 export class ArtistController {
   constructor(private artistService: ArtistService) {}
