@@ -53,19 +53,19 @@ export class TrackService {
 
   removeArtistDataFromTrack(artistId: string) {
     this.tracks = this.tracks.map((track) => {
-      if(track.artistId === artistId) {
-        return {...track, artistId: null}
+      if (track.artistId === artistId) {
+        return { ...track, artistId: null };
       }
-      return track
-    })
+      return track;
+    });
   }
 
   removeAlbumDataFromTrack(albumId: string) {
     this.tracks = this.tracks.map((track) => {
-      if(track.albumId === albumId) {
-        return {...track, albumId: null}
+      if (track.albumId === albumId) {
+        return { ...track, albumId: null };
       }
-      return track
-    })
+      return track;
+    });
   }
 }

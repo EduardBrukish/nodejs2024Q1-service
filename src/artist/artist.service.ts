@@ -37,7 +37,7 @@ export class ArtistService {
   updateArtist(artistToUpdate: Artist, artistDto: ArtistDto): Artist {
     const updatedArtist = Object.assign({}, artistToUpdate);
     updatedArtist.name = artistDto.name;
-    artistToUpdate.grammy = artistDto.grammy ?? false;
+    updatedArtist.grammy = artistDto.grammy ?? false;
 
     this.artists = this.artists.map((artist) => {
       return artist.id === updatedArtist.id ? updatedArtist : artist;

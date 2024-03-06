@@ -7,7 +7,7 @@ import { TrackService } from '../track/track.service';
 @Injectable()
 export class AlbumService {
   constructor(
-    @Inject(forwardRef(() => TrackService)) private trackService: TrackService
+    @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
   ) {}
 
   private albums: Album[] = [];
@@ -47,16 +47,16 @@ export class AlbumService {
   }
 
   deleteAlbum(id) {
-    this.trackService.removeAlbumDataFromTrack(id)
+    this.trackService.removeAlbumDataFromTrack(id);
     this.albums = this.albums.filter((album) => album.id !== id);
   }
 
   removeArtistDataFromAlbum(id: string) {
     this.albums = this.albums.map((album) => {
-      if(album.artistId === id) {
-        return {...album, artistId: null}
+      if (album.artistId === id) {
+        return { ...album, artistId: null };
       }
-      return album
-    })
+      return album;
+    });
   }
 }
