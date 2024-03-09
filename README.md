@@ -14,7 +14,7 @@ git clone git@github.com:EduardBrukish/nodejs2023Q2-service.git
 ## Go to the project folder
 
 ```
-cd nodejs2023Q2-service
+cd nodejs2024Q1-service
 ```
 
 ## Go to the development branch
@@ -27,6 +27,12 @@ git checkout develop
 
 ```
 npm install
+```
+
+## Add env file
+
+```
+app PORT value to the env file according .env.example file
 ```
 
 ## Running application
