@@ -97,11 +97,12 @@ export class UserController {
     //   throw new HttpException(`Wrong user password`, HttpStatus.FORBIDDEN);
     // }
 
-    const updatedUser = this.userService.updateUserPassword(
+    // ToDo add handlers to check if user exist and check old password
+
+    return this.userService.updateUserPassword(
       id,
       updateUserPasswordDto.newPassword,
     );
-    return updatedUser;
   }
 
   @Delete(':id')
