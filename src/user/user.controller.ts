@@ -30,6 +30,8 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
+import { UserEntity } from './entity/user.entity';
+
 @ApiTags('User')
 @Controller('user')
 export class UserController {
@@ -38,7 +40,7 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [UserDto] })
-  getUsers(): User[] {
+  getUsers(): Promise<UserEntity[]> {
     return this.userService.getUsers();
   }
 
@@ -48,7 +50,7 @@ export class UserController {
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'User with ID ${id} not found' })
   @UsePipes(ParseUUIDPipe)
-  getUser(@Param('id') id: string): User {
+  getUser(@Param('id') id: string): Promise<UserEntity> {
     const user = this.userService.findUser(id);
 
     if (!user) {
@@ -67,7 +69,7 @@ export class UserController {
     description: 'Body does not contain required fields',
   })
   @HttpCode(HttpStatus.CREATED)
-  createUser(@Body() createUserDto: CreateUserDto): UserDto {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
     const newUser = this.userService.createUser(createUserDto);
     return newUser;
   }
@@ -84,19 +86,19 @@ export class UserController {
   updateUserPassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
-  ): UserDto {
-    const user = this.userService.findUser(id);
+  ): Promise<UserEntity> {
+    // const user = this.userService.findUser(id);
 
-    if (!user) {
-      throw new CommonNotFoundException(`User with ID ${id} not found`);
-    }
+    // if (!user) {
+    //   throw new CommonNotFoundException(`User with ID ${id} not found`);
+    // }
 
-    if (updateUserPasswordDto.oldPassword !== user.password) {
-      throw new HttpException(`Wrong user password`, HttpStatus.FORBIDDEN);
-    }
+    // if (updateUserPasswordDto.oldPassword !== user.password) {
+    //   throw new HttpException(`Wrong user password`, HttpStatus.FORBIDDEN);
+    // }
 
     const updatedUser = this.userService.updateUserPassword(
-      user,
+      id,
       updateUserPasswordDto.newPassword,
     );
     return updatedUser;

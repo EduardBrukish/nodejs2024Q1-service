@@ -1,56 +1,64 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { User, UserWithoutPassword } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UserEntity } from './entity/user.entity';
 
 @Injectable({})
 export class UserService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>
+  ) {}
 
-  getUsers(): User[] {
-    return this.users;
+  async getUsers(): Promise<UserEntity[]> {
+    return this.userRepository.find();
   }
 
-  findUser(id: string): User | undefined {
-    return this.users.find((user: User) => user.id === id);
+  async findUser(id: string): Promise<UserEntity | undefined> {
+    return this.userRepository.findOne({ where: { id } });
   }
 
-  createUser(userDto: CreateUserDto): UserWithoutPassword {
-    const newUser = {} as User;
+  async createUser(userDto: CreateUserDto): Promise<UserEntity> {
+    const newUser = {} as UserEntity;
     newUser.id = uuidv4();
     newUser.login = userDto.login;
     newUser.password = userDto.password;
     newUser.version = 1;
     newUser.createdAt = new Date().getTime();
     newUser.updatedAt = new Date().getTime();
-    this.users = [...this.users, newUser];
 
-    const { password, ...userToReturn } = newUser;
-
-    return userToReturn;
+    const user = this.userRepository.create(newUser);
+    return await this.userRepository.save(user);
   }
 
-  updateUserPassword(
-    userToChange: User,
+  async updateUserPassword(
+    id: string,
     newPassword: string,
-  ): UserWithoutPassword {
-    const updatedUser = userToChange;
+  ): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      return undefined;
+    }
+
+    const updatedUser = Object.assign({}, user);
     updatedUser.password = newPassword;
-    updatedUser.version = userToChange.version + 1;
+    updatedUser.version = updatedUser.version + 1;
     updatedUser.updatedAt = new Date().getTime();
-    this.users = this.users.map((user) => {
-      if (user.id === updatedUser.id) {
-        return updatedUser;
-      }
-      return user;
-    });
+    // this.users = this.users.map((user) => {
+    //   if (user.id === updatedUser.id) {
+    //     return updatedUser;
+    //   }
+    //   return user;
+    // });
 
-    const { password, ...userToReturn } = updatedUser;
+    // const { password, ...userToReturn } = updatedUser;
 
-    return userToReturn;
+    return await this.userRepository.save(user);
   }
 
-  deleteUser(id: string): void {
-    this.users = this.users.filter((user: User) => user.id !== id);
+  async deleteUser(id: string): Promise<void> {
+    await this.userRepository.delete(id);
   }
 }
