@@ -3,7 +3,7 @@ import {
   Favorites,
   FavoriteCategories,
 } from './interfaces/favorites.interface';
-import { FavoritesResponseDto } from './dto/favorites.dto'
+import { FavoritesResponseDto } from './dto/favorites.dto';
 import { TrackService } from '../track/track.service';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
@@ -27,15 +27,15 @@ export class FavoritesService {
     const favoritesTracks = this.favs.tracks
       .map((trackId) => this.trackService.findTrack(trackId))
       .filter((track) => Boolean(track));
-    const albumsPromises =  this.favs.albums
+    const albumsPromises = this.favs.albums
       .map(async (albumId) => await this.albumService.findAlbum(albumId))
       .filter((album) => Boolean(album));
     const artistsPromises = this.favs.artists
       .map(async (artistId) => await this.artistService.findArtist(artistId))
       .filter((artist) => Boolean(artist));
 
-    const favoritesAlbums = await Promise.all(albumsPromises)
-    const favoritesArtists = await Promise.all(artistsPromises)
+    const favoritesAlbums = await Promise.all(albumsPromises);
+    const favoritesArtists = await Promise.all(artistsPromises);
 
     return {
       tracks: favoritesTracks,

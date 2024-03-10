@@ -17,11 +17,11 @@ import {
   ApiOkResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
-  ApiUnprocessableEntityResponse
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
 import { TrackService } from '../track/track.service';
-import { FavoritesResponseDto } from './dto/favorites.dto'
+import { FavoritesResponseDto } from './dto/favorites.dto';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
@@ -43,9 +43,13 @@ export class FavoritesController {
   }
 
   @Post('track/:id')
-  @ApiCreatedResponse({ description: 'The track was successfully added to the favorites.' })
+  @ApiCreatedResponse({
+    description: 'The track was successfully added to the favorites.',
+  })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiUnprocessableEntityResponse({ description: 'Track with ID ${id} does not exist' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Track with ID ${id} does not exist',
+  })
   @UsePipes(ParseUUIDPipe)
   addFavoriteTrack(@Param('id') id: string): string {
     const track = this.trackService.findTrack(id);
@@ -66,7 +70,9 @@ export class FavoritesController {
     description: 'Track with ID ${id} was deleted from favorites',
   })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiNotFoundResponse({ description: 'Track with ID ${id} not found in favorites' })
+  @ApiNotFoundResponse({
+    description: 'Track with ID ${id} not found in favorites',
+  })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   removeFavoriteTrack(@Param('id') id: string): string {

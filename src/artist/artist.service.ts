@@ -13,7 +13,7 @@ export class ArtistService {
   constructor(
     @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
-    @InjectRepository(Artist) private artistRepository: Repository<Artist>
+    @InjectRepository(Artist) private artistRepository: Repository<Artist>,
   ) {}
 
   async getArtists(): Promise<Artist[]> {
@@ -37,13 +37,15 @@ export class ArtistService {
     newArtist.name = artistDto.name;
     newArtist.grammy = artistDto.grammy ?? false;
 
-    const artist = await this.artistRepository.create(newArtist)
+    const artist = await this.artistRepository.create(newArtist);
 
     return await this.artistRepository.save(artist);
   }
 
   async updateArtist(id: string, artistDto: ArtistDto): Promise<Artist> {
-    const artistToUpdate = await this.artistRepository.findOne({ where: { id } })
+    const artistToUpdate = await this.artistRepository.findOne({
+      where: { id },
+    });
 
     if (!artistToUpdate) {
       throw new CommonNotFoundException(`Artist with ID ${id} not found`);
@@ -63,9 +65,9 @@ export class ArtistService {
       throw new CommonNotFoundException(`Artist with ID ${id} not found`);
     }
 
-    // this.albumService.removeArtistDataFromAlbum(id);
     // this.trackService.removeArtistDataFromTrack(id);
 
-    await this.artistRepository.delete(id)
+    await this.albumService.removeArtistDataFromAlbum(id);
+    await this.artistRepository.delete(id);
   }
 }

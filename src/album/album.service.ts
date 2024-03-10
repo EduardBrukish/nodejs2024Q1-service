@@ -11,7 +11,7 @@ import { CommonNotFoundException } from '../exception/not-found.exception';
 export class AlbumService {
   constructor(
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
-    @InjectRepository(Album) private albumRepository: Repository<Album>
+    @InjectRepository(Album) private albumRepository: Repository<Album>,
   ) {}
 
   private albums: Album[] = [];
@@ -38,15 +38,12 @@ export class AlbumService {
     newAlbum.year = albumDto.year;
     newAlbum.artistId = albumDto.artistId ?? null;
 
-    const album = await this.albumRepository.create(newAlbum)
+    const album = await this.albumRepository.create(newAlbum);
 
     return await this.albumRepository.save(album);
   }
 
-  async updateAlbum(
-    id: string,
-    albumDto: AlbumDto,
-  ): Promise<Album> {
+  async updateAlbum(id: string, albumDto: AlbumDto): Promise<Album> {
     const album = await this.albumRepository.findOne({ where: { id } });
 
     if (!album) {
@@ -68,17 +65,25 @@ export class AlbumService {
       throw new CommonNotFoundException(`Album with ID ${id} not found`);
     }
 
-    await this.albumRepository.delete(id)
+    await this.albumRepository.delete(id);
     // ToDo remove album data from track
     // this.trackService.removeAlbumDataFromTrack(id);
   }
 
-  removeArtistDataFromAlbum(id: string) {
-    this.albums = this.albums.map((album) => {
-      if (album.artistId === id) {
-        return { ...album, artistId: null };
-      }
-      return album;
+  async removeArtistDataFromAlbum(artistId: string) {
+    const albumsToUpdate = await this.albumRepository.find({
+      where: { artistId },
     });
+
+    if (!albumsToUpdate.length) {
+      throw new CommonNotFoundException(`Artist with ID ${artistId} not found`);
+    }
+
+    for (const albumToUpdate of albumsToUpdate) {
+      const updatedAlbum = Object.assign({}, albumToUpdate);
+      updatedAlbum.artistId = null;
+
+      await this.albumRepository.save(updatedAlbum);
+    }
   }
 }

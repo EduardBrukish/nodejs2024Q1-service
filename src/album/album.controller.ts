@@ -22,7 +22,6 @@ import {
   ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { AlbumService } from './album.service';
-import { CommonNotFoundException } from '../exception/not-found.exception';
 import { AlbumDto } from './dto/album.dto';
 import { Album } from './entity/album.entity';
 

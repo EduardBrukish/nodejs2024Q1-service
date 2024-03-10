@@ -10,7 +10,7 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto';
 @Injectable({})
 export class UserService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   async getUsers(): Promise<User[]> {
@@ -18,13 +18,13 @@ export class UserService {
   }
 
   async findUser(id: string): Promise<User | undefined> {
-    const user = await this.userRepository.findOne({ where: { id } });    
-    
+    const user = await this.userRepository.findOne({ where: { id } });
+
     if (!user) {
       throw new CommonNotFoundException(`User with ID ${id} not found`);
     }
 
-    return user
+    return user;
   }
 
   async createUser(userDto: CreateUserDto): Promise<User> {

@@ -8,7 +8,6 @@ import {
   Body,
   Post,
   Put,
-  HttpException,
   HttpCode,
   HttpStatus,
   ValidationPipe,
@@ -85,10 +84,7 @@ export class UserController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
   ): Promise<User> {
-    return this.userService.updateUserPassword(
-      id,
-      updateUserPasswordDto,
-    );
+    return this.userService.updateUserPassword(id, updateUserPasswordDto);
   }
 
   @Delete(':id')
@@ -100,7 +96,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
   async deleteUser(@Param('id') id: string): Promise<string> {
-    await this.userService.deleteUser(id)
+    await this.userService.deleteUser(id);
     return `User with ID ${id} was deleted successfully`;
   }
 }
