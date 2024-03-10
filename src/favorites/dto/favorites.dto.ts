@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArtistResponseDto } from '../../artist/dto/artist.dto';
+import { Artist } from '../../artist/entity/artist.entity';
 import { Album } from '../../album/entity/album.entity';
 import { TrackResponseDto } from '../../track/dto/track.dto';
 
 export class FavoritesResponseDto {
-  @ApiProperty({ type: [ArtistResponseDto] })
-  artists: ArtistResponseDto[];
+  @ApiProperty({ type: [Artist] })
+  artists: Artist[];
 
   @ApiProperty({ type: [Album] })
   albums: Album[];

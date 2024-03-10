@@ -28,16 +28,14 @@ export class FavoritesService {
       .map((trackId) => this.trackService.findTrack(trackId))
       .filter((track) => Boolean(track));
     const albumsPromises =  this.favs.albums
-      .map(async (albumId) => {
-        console.log(albumId)
-        if(albumId) return await this.albumService.findAlbum(albumId)
-      })
+      .map(async (albumId) => await this.albumService.findAlbum(albumId))
       .filter((album) => Boolean(album));
-    const favoritesArtists = this.favs.artists
-      .map((artistId) => this.artistService.findArtist(artistId))
+    const artistsPromises = this.favs.artists
+      .map(async (artistId) => await this.artistService.findArtist(artistId))
       .filter((artist) => Boolean(artist));
 
     const favoritesAlbums = await Promise.all(albumsPromises)
+    const favoritesArtists = await Promise.all(artistsPromises)
 
     return {
       tracks: favoritesTracks,

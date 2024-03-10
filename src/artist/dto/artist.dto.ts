@@ -15,14 +15,3 @@ export class ArtistDto {
   @ApiProperty()
   id?: string;
 }
-
-export class ArtistResponseDto {
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  grammy: boolean;
-
-  @ApiProperty()
-  id: string;
-}

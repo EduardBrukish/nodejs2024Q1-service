@@ -126,45 +126,45 @@ export class FavoritesController {
   //   return `Album with ID ${id} was deleted from favorites`;
   // }
 
-  @Post('artist/:id')
-  @ApiCreatedResponse({ description: 'The artist was successfully added to the favorites.' })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiUnprocessableEntityResponse({ description: 'Artist with ID ${id} does not exist' })
-  @UsePipes(ParseUUIDPipe)
-  addFavoriteArtist(@Param('id') id: string): string {
-    const artist = this.artistService.findArtist(id);
+  // @Post('artist/:id')
+  // @ApiCreatedResponse({ description: 'The artist was successfully added to the favorites.' })
+  // @ApiBadRequestResponse({ description: 'Invalid Id' })
+  // @ApiUnprocessableEntityResponse({ description: 'Artist with ID ${id} does not exist' })
+  // @UsePipes(ParseUUIDPipe)
+  // addFavoriteArtist(@Param('id') id: string): string {
+  //   const artist = this.artistService.findArtist(id);
 
-    if (!artist) {
-      throw new UnprocessableEntityException(
-        `Track with ID ${id} doesn't exist`,
-      );
-    }
+  //   if (!artist) {
+  //     throw new UnprocessableEntityException(
+  //       `Track with ID ${id} doesn't exist`,
+  //     );
+  //   }
 
-    this.favoritesService.addToFavoriteByCategory('artists', id);
+  //   this.favoritesService.addToFavoriteByCategory('artists', id);
 
-    return `Artist with ID ${id} was added to the favorites`;
-  }
+  //   return `Artist with ID ${id} was added to the favorites`;
+  // }
 
-  @Delete('artist/:id')
-  @ApiNoContentResponse({
-    description: 'Artist with ID ${id} was deleted from favorites',
-  })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found in favorites' })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(ParseUUIDPipe)
-  removeFavoriteArtist(@Param('id') id: string): string {
-    const categoryItemId = this.favoritesService.findFavoriteByCategory(
-      'artists',
-      id,
-    );
+  // @Delete('artist/:id')
+  // @ApiNoContentResponse({
+  //   description: 'Artist with ID ${id} was deleted from favorites',
+  // })
+  // @ApiBadRequestResponse({ description: 'Invalid Id' })
+  // @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found in favorites' })
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // @UsePipes(ParseUUIDPipe)
+  // removeFavoriteArtist(@Param('id') id: string): string {
+  //   const categoryItemId = this.favoritesService.findFavoriteByCategory(
+  //     'artists',
+  //     id,
+  //   );
 
-    if (!categoryItemId) {
-      throw new CommonNotFoundException(`Artist with ID ${id} isn't favorite`);
-    }
+  //   if (!categoryItemId) {
+  //     throw new CommonNotFoundException(`Artist with ID ${id} isn't favorite`);
+  //   }
 
-    this.favoritesService.removeFromFavoriteByCategory('artists', id);
+  //   this.favoritesService.removeFromFavoriteByCategory('artists', id);
 
-    return `Artist with ID ${id} was deleted from favorites`;
-  }
+  //   return `Artist with ID ${id} was deleted from favorites`;
+  // }
 }

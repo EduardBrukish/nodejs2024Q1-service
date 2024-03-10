@@ -1,6 +1,10 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { ArtistDto, ArtistResponseDto } from './dto/artist.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CommonNotFoundException } from 'src/exception/not-found.exception';
+import { ArtistDto } from './dto/artist.dto';
+import { Artist } from './entity/artist.entity';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
 
@@ -9,45 +13,59 @@ export class ArtistService {
   constructor(
     @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
+    @InjectRepository(Artist) private artistRepository: Repository<Artist>
   ) {}
 
-  private artists: ArtistResponseDto[] = [];
-
-  getArtists(): ArtistResponseDto[] {
-    return this.artists;
+  async getArtists(): Promise<Artist[]> {
+    return await this.artistRepository.find();
   }
 
-  findArtist(id): ArtistResponseDto {
-    return this.artists.find((artist) => artist.id === id);
+  async findArtist(id: string): Promise<Artist> {
+    const artist = await this.artistRepository.findOne({ where: { id } });
+
+    if (!artist) {
+      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
+    }
+
+    return artist;
   }
 
-  createArtist(artistDto: ArtistDto): ArtistResponseDto {
-    const newArtist = {} as ArtistResponseDto;
+  async createArtist(artistDto: ArtistDto): Promise<Artist> {
+    const newArtist = {} as Artist;
 
     newArtist.id = uuidv4();
     newArtist.name = artistDto.name;
     newArtist.grammy = artistDto.grammy ?? false;
 
-    this.artists = [...this.artists, newArtist];
+    const artist = await this.artistRepository.create(newArtist)
 
-    return newArtist;
+    return await this.artistRepository.save(artist);
   }
 
-  updateArtist(artistToUpdate: ArtistResponseDto, artistDto: ArtistDto): ArtistResponseDto {
+  async updateArtist(id: string, artistDto: ArtistDto): Promise<Artist> {
+    const artistToUpdate = await this.artistRepository.findOne({ where: { id } })
+
+    if (!artistToUpdate) {
+      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
+    }
+
     const updatedArtist = Object.assign({}, artistToUpdate);
     updatedArtist.name = artistDto.name;
     updatedArtist.grammy = artistDto.grammy ?? false;
 
-    this.artists = this.artists.map((artist) => {
-      return artist.id === updatedArtist.id ? updatedArtist : artist;
-    });
-
-    return updatedArtist;
+    return await this.artistRepository.save(updatedArtist);
   }
 
-  deleteArtist(id) {
-    this.albumService.removeArtistDataFromAlbum(id);
-    this.trackService.removeArtistDataFromTrack(id);
-    this.artists = this.artists.filter((artist) => artist.id !== id);
+  async deleteArtist(id: string) {
+    const artist = this.artistRepository.findOne({ where: { id } });
+
+    if (!artist) {
+      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
+    }
+
+    // this.albumService.removeArtistDataFromAlbum(id);
+    // this.trackService.removeArtistDataFromTrack(id);
+
+    await this.artistRepository.delete(id)
   }
 }

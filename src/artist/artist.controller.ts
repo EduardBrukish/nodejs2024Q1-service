@@ -22,8 +22,8 @@ import {
   ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { ArtistService } from './artist.service';
-import { CommonNotFoundException } from 'src/exception/not-found.exception';
-import { ArtistDto, ArtistResponseDto } from './dto/artist.dto';
+import { ArtistDto } from './dto/artist.dto';
+import { Artist } from './entity/artist.entity';
 
 @ApiTags('Artist')
 @Controller('artist')
@@ -32,60 +32,47 @@ export class ArtistController {
 
   @Get()
   @ApiOperation({ summary: 'Get all artists' })
-  @ApiOkResponse({ type: [ArtistResponseDto] })
-  getArtists(): ArtistResponseDto[] {
-    return this.artistService.getArtists();
+  @ApiOkResponse({ type: [Artist] })
+  async getArtists(): Promise<Artist[]> {
+    return await this.artistService.getArtists();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get artist by id' })
-  @ApiOkResponse({ type: ArtistResponseDto })
+  @ApiOkResponse({ type: Artist })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })
   @UsePipes(ParseUUIDPipe)
-  getArtist(@Param('id') id: string): ArtistResponseDto {
-    const artist = this.artistService.findArtist(id);
-
-    if (!artist) {
-      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
-    }
-
-    return artist;
+  async getArtist(@Param('id') id: string): Promise<Artist> {
+    return await this.artistService.findArtist(id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({
     description: 'The artist has been successfully created.',
-    type: ArtistResponseDto,
+    type: Artist,
   })
   @ApiBadRequestResponse({
     description: 'Request body does not contain required fields',
   })
-  createArtist(@Body() artistDto: ArtistDto): ArtistResponseDto {
-    const newArtist = this.artistService.createArtist(artistDto);
-    return newArtist;
+  async createArtist(@Body() artistDto: ArtistDto): Promise<Artist> {
+    return await this.artistService.createArtist(artistDto);
   }
 
   @Put(':id')
   @ApiOkResponse({
     description: 'The artist data has been successfully updated.',
-    type: ArtistResponseDto,
+    type: Artist,
   })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })
   @UsePipes(new ValidationPipe())
-  updateArtist(
+  async updateArtist(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: ArtistDto,
-  ): ArtistResponseDto {
-    const artist = this.artistService.findArtist(id);
-
-    if (!artist) {
-      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
-    }
-
-    return this.artistService.updateArtist(artist, updateArtistDto);
+  ): Promise<Artist> {
+    return await this.artistService.updateArtist(id, updateArtistDto);
   }
 
   @Delete(':id')
@@ -96,14 +83,8 @@ export class ArtistController {
   @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
-  deleteArtist(@Param('id') id: string): string {
-    const artist = this.artistService.findArtist(id);
-
-    if (!artist) {
-      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
-    }
-
-    this.artistService.deleteArtist(id);
+  async deleteArtist(@Param('id') id: string): Promise<string> {
+    await this.artistService.deleteArtist(id);
 
     return `Artist with ID ${id} was deleted successfully`;
   }
