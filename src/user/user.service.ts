@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/createUser.dto';
-import { UserEntity } from './entity/user.entity';
+import { User } from './entity/user.entity';
+import { CommonNotFoundException } from '../exception/not-found.exception';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Injectable({})
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>
+    @InjectRepository(User) private userRepository: Repository<User>
   ) {}
 
-  async getUsers(): Promise<UserEntity[]> {
+  async getUsers(): Promise<User[]> {
     return this.userRepository.find();
   }
 
-  async findUser(id: string): Promise<UserEntity | undefined> {
-    return this.userRepository.findOne({ where: { id } });
+  async findUser(id: string): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({ where: { id } });    
+    
+    if (!user) {
+      throw new CommonNotFoundException(`User with ID ${id} not found`);
+    }
+
+    return user
   }
 
-  async createUser(userDto: CreateUserDto): Promise<UserEntity> {
-    const newUser = {} as UserEntity;
+  async createUser(userDto: CreateUserDto): Promise<User> {
+    const newUser = {} as User;
     newUser.id = uuidv4();
     newUser.login = userDto.login;
     newUser.password = userDto.password;
@@ -28,37 +36,39 @@ export class UserService {
     newUser.createdAt = new Date().getTime();
     newUser.updatedAt = new Date().getTime();
 
-    const user = this.userRepository.create(newUser);
+    const user = await this.userRepository.create(newUser);
     return await this.userRepository.save(user);
   }
 
   async updateUserPassword(
     id: string,
-    newPassword: string,
-  ): Promise<UserEntity | undefined> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<User | undefined> {
+    const user: User = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
-      return undefined;
+      throw new CommonNotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new HttpException(`Wrong user password`, HttpStatus.FORBIDDEN);
     }
 
     const updatedUser = Object.assign({}, user);
-    updatedUser.password = newPassword;
+    updatedUser.password = updatePasswordDto.newPassword;
     updatedUser.version = updatedUser.version + 1;
     updatedUser.updatedAt = new Date().getTime();
-    // this.users = this.users.map((user) => {
-    //   if (user.id === updatedUser.id) {
-    //     return updatedUser;
-    //   }
-    //   return user;
-    // });
-
-    // const { password, ...userToReturn } = updatedUser;
 
     return await this.userRepository.save(user);
   }
 
   async deleteUser(id: string): Promise<void> {
+    const user: User = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new CommonNotFoundException(`User with ID ${id} not found`);
+    }
+
     await this.userRepository.delete(id);
   }
 }

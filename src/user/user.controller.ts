@@ -25,12 +25,11 @@ import {
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
-import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
-import { UserEntity } from './entity/user.entity';
+import { User } from './entity/user.entity';
 
 @ApiTags('User')
 @Controller('user')
@@ -40,7 +39,7 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [UserDto] })
-  getUsers(): Promise<UserEntity[]> {
+  getUsers(): Promise<User[]> {
     return this.userService.getUsers();
   }
 
@@ -50,7 +49,7 @@ export class UserController {
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'User with ID ${id} not found' })
   @UsePipes(ParseUUIDPipe)
-  getUser(@Param('id') id: string): Promise<UserEntity> {
+  getUser(@Param('id') id: string): Promise<User> {
     const user = this.userService.findUser(id);
 
     if (!user) {
@@ -69,7 +68,7 @@ export class UserController {
     description: 'Body does not contain required fields',
   })
   @HttpCode(HttpStatus.CREATED)
-  createUser(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     const newUser = this.userService.createUser(createUserDto);
     return newUser;
   }
@@ -86,22 +85,10 @@ export class UserController {
   updateUserPassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
-  ): Promise<UserEntity> {
-    // const user = this.userService.findUser(id);
-
-    // if (!user) {
-    //   throw new CommonNotFoundException(`User with ID ${id} not found`);
-    // }
-
-    // if (updateUserPasswordDto.oldPassword !== user.password) {
-    //   throw new HttpException(`Wrong user password`, HttpStatus.FORBIDDEN);
-    // }
-
-    // ToDo add handlers to check if user exist and check old password
-
+  ): Promise<User> {
     return this.userService.updateUserPassword(
       id,
-      updateUserPasswordDto.newPassword,
+      updateUserPasswordDto,
     );
   }
 
@@ -113,15 +100,8 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User with ID ${id} not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
-  deleteUser(@Param('id') id: string): string {
-    const user = this.userService.findUser(id);
-
-    if (!user) {
-      throw new CommonNotFoundException(`User with ID ${id} not found`);
-    }
-
-    this.userService.deleteUser(id);
-
+  async deleteUser(@Param('id') id: string): Promise<string> {
+    await this.userService.deleteUser(id)
     return `User with ID ${id} was deleted successfully`;
   }
 }
