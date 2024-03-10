@@ -23,16 +23,21 @@ export class FavoritesService {
     tracks: [],
   };
 
-  getFavorites(): FavoritesResponseDto {
+  async getFavorites(): Promise<FavoritesResponseDto> {
     const favoritesTracks = this.favs.tracks
       .map((trackId) => this.trackService.findTrack(trackId))
       .filter((track) => Boolean(track));
-    const favoritesAlbums = this.favs.albums
-      .map((albumId) => this.albumService.findAlbum(albumId))
+    const albumsPromises =  this.favs.albums
+      .map(async (albumId) => {
+        console.log(albumId)
+        if(albumId) return await this.albumService.findAlbum(albumId)
+      })
       .filter((album) => Boolean(album));
     const favoritesArtists = this.favs.artists
       .map((artistId) => this.artistService.findArtist(artistId))
       .filter((artist) => Boolean(artist));
+
+    const favoritesAlbums = await Promise.all(albumsPromises)
 
     return {
       tracks: favoritesTracks,

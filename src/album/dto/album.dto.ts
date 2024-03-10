@@ -15,17 +15,3 @@ export class AlbumDto {
   @ApiProperty()
   artistId?: string | null;
 }
-
-export class AlbumResponseDto {
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  year: number;
-
-  @ApiProperty()
-  artistId: string | null;
-}

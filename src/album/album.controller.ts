@@ -23,7 +23,8 @@ import {
 } from '@nestjs/swagger';
 import { AlbumService } from './album.service';
 import { CommonNotFoundException } from '../exception/not-found.exception';
-import { AlbumDto, AlbumResponseDto } from './dto/album.dto';
+import { AlbumDto } from './dto/album.dto';
+import { Album } from './entity/album.entity';
 
 @ApiTags('Album')
 @Controller('album')
@@ -32,61 +33,53 @@ export class AlbumController {
 
   @Get()
   @ApiOperation({ summary: 'Get all albums' })
-  @ApiOkResponse({ type: [AlbumResponseDto] })
-  getAlbums(): AlbumResponseDto[] {
-    return this.albumService.getAlbums();
+  @ApiOkResponse({ type: [Album] })
+  async getAlbums(): Promise<Album[]> {
+    return await this.albumService.getAlbums();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get album by id' })
-  @ApiOkResponse({ type: AlbumResponseDto })
+  @ApiOkResponse({ type: Album })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'Album with ID ${id} not found' })
   @UsePipes(ParseUUIDPipe)
-  getAlbum(@Param('id') id: string): AlbumResponseDto {
-    const album = this.albumService.findAlbum(id);
-
-    if (!album) {
-      throw new CommonNotFoundException(`Album with ID ${id} not found`);
-    }
-
-    return album;
+  async getAlbum(@Param('id') id: string): Promise<Album> {
+    return await this.albumService.findAlbum(id);
   }
 
   @Post()
   @ApiCreatedResponse({
     description: 'The artist has been successfully created.',
-    type: AlbumResponseDto,
+    type: Album,
   })
   @ApiBadRequestResponse({
     description: 'Request body does not contain required fields',
   })
   @HttpCode(HttpStatus.CREATED)
-  createAlbum(@Body() albumDto: AlbumDto): AlbumResponseDto {
-    const newAlbum = this.albumService.createAlbum(albumDto);
-
-    return newAlbum;
+  async createAlbum(@Body() albumDto: AlbumDto): Promise<Album> {
+    return await this.albumService.createAlbum(albumDto);
   }
 
   @Put(':id')
   @ApiOkResponse({
     description: 'The album data has been successfully updated.',
-    type: AlbumResponseDto,
+    type: Album,
   })
   @ApiBadRequestResponse({ description: 'Invalid Id' })
   @ApiNotFoundResponse({ description: 'Album with ID ${id} not found' })
   @UsePipes(new ValidationPipe())
-  updateAlbum(
+  async updateAlbum(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() albumDto: AlbumDto,
-  ): AlbumResponseDto {
-    const album = this.albumService.findAlbum(id);
+  ): Promise<Album> {
+    // const album = this.albumService.findAlbum(id);
 
-    if (!album) {
-      throw new CommonNotFoundException(`Album with ID ${id} not found`);
-    }
+    // if (!album) {
+    //   throw new CommonNotFoundException(`Album with ID ${id} not found`);
+    // }
 
-    return this.albumService.updateAlbum(album, albumDto);
+    return await this.albumService.updateAlbum(id, albumDto);
   }
 
   @Delete(':id')
@@ -97,14 +90,8 @@ export class AlbumController {
   @ApiNotFoundResponse({ description: 'Album with ID ${id} not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @UsePipes(ParseUUIDPipe)
-  deleteAlbum(@Param('id') id: string): string {
-    const album = this.albumService.findAlbum(id);
-
-    if (!album) {
-      throw new CommonNotFoundException(`Album with ID ${id} not found`);
-    }
-
-    this.albumService.deleteAlbum(id);
+  async deleteAlbum(@Param('id') id: string): Promise<string> {
+    await this.albumService.deleteAlbum(id);
 
     return `Album with ID ${id} was deleted successfully`;
   }

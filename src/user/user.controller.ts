@@ -28,7 +28,6 @@ import { CommonNotFoundException } from '../exception/not-found.exception';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UserDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
-
 import { User } from './entity/user.entity';
 
 @ApiTags('User')

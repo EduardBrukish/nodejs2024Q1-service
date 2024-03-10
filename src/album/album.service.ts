@@ -1,56 +1,76 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { AlbumDto, AlbumResponseDto } from './dto/album.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AlbumDto } from './dto/album.dto';
+import { Album } from './entity/album.entity';
 import { TrackService } from '../track/track.service';
+import { CommonNotFoundException } from '../exception/not-found.exception';
 
 @Injectable()
 export class AlbumService {
   constructor(
     @Inject(forwardRef(() => TrackService)) private trackService: TrackService,
+    @InjectRepository(Album) private albumRepository: Repository<Album>
   ) {}
 
-  private albums: AlbumResponseDto[] = [];
+  private albums: Album[] = [];
 
-  getAlbums(): AlbumResponseDto[] {
-    return this.albums;
+  async getAlbums(): Promise<Album[]> {
+    return await this.albumRepository.find();
   }
 
-  findAlbum(id): AlbumResponseDto {
-    return this.albums.find((album) => album.id === id);
+  async findAlbum(id: string): Promise<Album> {
+    const album = await this.albumRepository.findOne({ where: { id } });
+
+    if (!album) {
+      throw new CommonNotFoundException(`Album with ID ${id} not found`);
+    }
+
+    return album;
   }
 
-  createAlbum(albumDto: AlbumDto): AlbumResponseDto {
-    const newAlbum = {} as AlbumResponseDto;
+  async createAlbum(albumDto: AlbumDto): Promise<Album> {
+    const newAlbum = {} as Album;
 
     newAlbum.id = uuidv4();
     newAlbum.name = albumDto.name;
     newAlbum.year = albumDto.year;
     newAlbum.artistId = albumDto.artistId ?? null;
 
-    this.albums = [...this.albums, newAlbum];
+    const album = await this.albumRepository.create(newAlbum)
 
-    return newAlbum;
+    return await this.albumRepository.save(album);
   }
 
-  updateAlbum(
-    albumToUpdate: AlbumResponseDto,
+  async updateAlbum(
+    id: string,
     albumDto: AlbumDto,
-  ): AlbumResponseDto {
-    const updatedAlbum = Object.assign({}, albumToUpdate);
+  ): Promise<Album> {
+    const album = await this.albumRepository.findOne({ where: { id } });
+
+    if (!album) {
+      throw new CommonNotFoundException(`Album with ID ${id} not found`);
+    }
+
+    const updatedAlbum = Object.assign({}, album);
     updatedAlbum.name = albumDto.name;
     updatedAlbum.year = albumDto.year;
     updatedAlbum.artistId = albumDto.artistId ?? null;
 
-    this.albums = this.albums.map((album) => {
-      return album.id === updatedAlbum.id ? updatedAlbum : album;
-    });
-
-    return updatedAlbum;
+    return await this.albumRepository.save(updatedAlbum);
   }
 
-  deleteAlbum(id) {
-    this.trackService.removeAlbumDataFromTrack(id);
-    this.albums = this.albums.filter((album) => album.id !== id);
+  async deleteAlbum(id: string): Promise<void> {
+    const album = await this.albumRepository.findOne({ where: { id } });
+
+    if (!album) {
+      throw new CommonNotFoundException(`Album with ID ${id} not found`);
+    }
+
+    await this.albumRepository.delete(id)
+    // ToDo remove album data from track
+    // this.trackService.removeAlbumDataFromTrack(id);
   }
 
   removeArtistDataFromAlbum(id: string) {

@@ -38,8 +38,8 @@ export class FavoritesController {
 
   @Get()
   @ApiOkResponse({ type: [FavoritesResponseDto] })
-  getFavorites(): FavoritesResponseDto {
-    return this.favoritesService.getFavorites();
+  async getFavorites(): Promise<FavoritesResponseDto> {
+    return await this.favoritesService.getFavorites();
   }
 
   @Post('track/:id')
@@ -84,47 +84,47 @@ export class FavoritesController {
     return `Track with ID ${id} was deleted from favorites`;
   }
 
-  @Post('album/:id')
-  @ApiCreatedResponse({ description: 'The album was successfully added to the favorites.' })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiUnprocessableEntityResponse({ description: 'Album with ID ${id} does not exist' })
-  @UsePipes(ParseUUIDPipe)
-  addFavoriteAlbum(@Param('id') id: string): string {
-    const categoryItemId = this.albumService.findAlbum(id);
+  // @Post('album/:id')
+  // @ApiCreatedResponse({ description: 'The album was successfully added to the favorites.' })
+  // @ApiBadRequestResponse({ description: 'Invalid Id' })
+  // @ApiUnprocessableEntityResponse({ description: 'Album with ID ${id} does not exist' })
+  // @UsePipes(ParseUUIDPipe)
+  // addFavoriteAlbum(@Param('id') id: string): string {
+  //   const categoryItemId = this.albumService.findAlbum(id);
 
-    if (!categoryItemId) {
-      throw new UnprocessableEntityException(
-        `Album with ID ${id} doesn't exist`,
-      );
-    }
+  //   if (!categoryItemId) {
+  //     throw new UnprocessableEntityException(
+  //       `Album with ID ${id} doesn't exist`,
+  //     );
+  //   }
 
-    this.favoritesService.addToFavoriteByCategory('albums', id);
+  //   this.favoritesService.addToFavoriteByCategory('albums', id);
 
-    return `Album with ID ${id} was added to the favorites`;
-  }
+  //   return `Album with ID ${id} was added to the favorites`;
+  // }
 
-  @Delete('album/:id')
-  @ApiNoContentResponse({
-    description: 'Album with ID ${id} was deleted from favorites',
-  })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiNotFoundResponse({ description: 'Album with ID ${id} not found in favorites' })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(ParseUUIDPipe)
-  removeFavoriteAlbum(@Param('id') id: string): string {
-    const categoryItemId = this.favoritesService.findFavoriteByCategory(
-      'albums',
-      id,
-    );
+  // @Delete('album/:id')
+  // @ApiNoContentResponse({
+  //   description: 'Album with ID ${id} was deleted from favorites',
+  // })
+  // @ApiBadRequestResponse({ description: 'Invalid Id' })
+  // @ApiNotFoundResponse({ description: 'Album with ID ${id} not found in favorites' })
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // @UsePipes(ParseUUIDPipe)
+  // removeFavoriteAlbum(@Param('id') id: string): string {
+  //   const categoryItemId = this.favoritesService.findFavoriteByCategory(
+  //     'albums',
+  //     id,
+  //   );
 
-    if (!categoryItemId) {
-      throw new CommonNotFoundException(`Album with ID ${id} isn't favorite`);
-    }
+  //   if (!categoryItemId) {
+  //     throw new CommonNotFoundException(`Album with ID ${id} isn't favorite`);
+  //   }
 
-    this.favoritesService.removeFromFavoriteByCategory('albums', id);
+  //   this.favoritesService.removeFromFavoriteByCategory('albums', id);
 
-    return `Album with ID ${id} was deleted from favorites`;
-  }
+  //   return `Album with ID ${id} was deleted from favorites`;
+  // }
 
   @Post('artist/:id')
   @ApiCreatedResponse({ description: 'The artist was successfully added to the favorites.' })
