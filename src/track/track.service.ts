@@ -1,55 +1,73 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { TrackDto, TrackResponseDto } from './dto/track.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TrackDto } from './dto/track.dto';
+import { Track } from './entity/track.entity';
+import { CommonNotFoundException } from '../exception/not-found.exception';
 
 @Injectable()
 export class TrackService {
-  private tracks: TrackResponseDto[] = [];
+  constructor(
+    @InjectRepository(Track) private trackRepository: Repository<Track>,
+  ) {}
 
-  getTracks(): TrackResponseDto[] {
-    return this.tracks;
+  private tracks: Track[] = [];
+
+  async getTracks(): Promise<Track[]> {
+    return await this.trackRepository.find();
   }
 
-  findTrack(id: string): TrackResponseDto | undefined {
-    return this.tracks.find((track) => track.id === id);
+  async findTrack(id: string): Promise<Track> {
+    const track = await this.trackRepository.findOne({ where: { id } });
+
+    if (!track) {
+      throw new CommonNotFoundException(`Track with ID ${id} not found`);
+    }
+
+    return track;
   }
 
-  createTrack(trackDto: TrackDto): TrackResponseDto {
-    const newTrack = {} as TrackResponseDto;
+  async createTrack(trackDto: TrackDto): Promise<Track> {
+    const newTrack = {} as Track;
     newTrack.id = uuidv4();
     newTrack.name = trackDto.name;
     newTrack.albumId = trackDto.albumId ?? null;
     newTrack.artistId = trackDto.artistId ?? null;
     newTrack.duration = trackDto.duration;
 
-    this.tracks = [...this.tracks, newTrack];
+    const track = await this.trackRepository.create(newTrack);
 
-    return newTrack;
+    return await this.trackRepository.save(track);
   }
 
-  updateTrack(track: TrackResponseDto, trackDto: TrackDto): TrackResponseDto {
+  async updateTrack(id: string, trackDto: TrackDto): Promise<Track> {
+    const track = await this.trackRepository.findOne({ where: { id } });
+
+    if (!track) {
+      throw new CommonNotFoundException(`Track with ID ${id} not found`);
+    }
+
     const clonedTrack = Object.assign({}, track);
     clonedTrack.name = trackDto.name;
-    clonedTrack.albumId = trackDto.albumId || track.albumId;
-    clonedTrack.artistId = trackDto.artistId || track.artistId;
+    clonedTrack.albumId = trackDto.albumId || null;
+    clonedTrack.artistId = trackDto.artistId || null;
     clonedTrack.duration = trackDto.duration || track.duration;
 
-    this.tracks = this.tracks.map((track) => {
-      if (track.id === clonedTrack.id) {
-        return clonedTrack;
-      }
-      return track;
-    });
-
-    this.tracks = [...this.tracks, clonedTrack];
-
-    return clonedTrack;
+    return await this.trackRepository.save(clonedTrack);
   }
 
-  deleteTrack(id: string) {
-    this.tracks = this.tracks.filter((track) => track.id !== id);
+  async deleteTrack(id: string): Promise<void> {
+    const track = await this.trackRepository.findOne({ where: { id } });
+
+    if (!track) {
+      throw new CommonNotFoundException(`Track with ID ${id} not found`);
+    }
+
+    await this.trackRepository.delete(id);
   }
 
+  // ToDo remove artist and album data from track
   removeArtistDataFromTrack(artistId: string) {
     this.tracks = this.tracks.map((track) => {
       if (track.artistId === artistId) {

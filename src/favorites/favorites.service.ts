@@ -24,8 +24,8 @@ export class FavoritesService {
   };
 
   async getFavorites(): Promise<FavoritesResponseDto> {
-    const favoritesTracks = this.favs.tracks
-      .map((trackId) => this.trackService.findTrack(trackId))
+    const tracksPromises = this.favs.tracks
+      .map(async (trackId) => await this.trackService.findTrack(trackId))
       .filter((track) => Boolean(track));
     const albumsPromises = this.favs.albums
       .map(async (albumId) => await this.albumService.findAlbum(albumId))
@@ -34,6 +34,7 @@ export class FavoritesService {
       .map(async (artistId) => await this.artistService.findArtist(artistId))
       .filter((artist) => Boolean(artist));
 
+    const favoritesTracks = await Promise.all(tracksPromises);
     const favoritesAlbums = await Promise.all(albumsPromises);
     const favoritesArtists = await Promise.all(artistsPromises);
 

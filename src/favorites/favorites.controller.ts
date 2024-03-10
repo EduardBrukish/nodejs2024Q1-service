@@ -42,53 +42,53 @@ export class FavoritesController {
     return await this.favoritesService.getFavorites();
   }
 
-  @Post('track/:id')
-  @ApiCreatedResponse({
-    description: 'The track was successfully added to the favorites.',
-  })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiUnprocessableEntityResponse({
-    description: 'Track with ID ${id} does not exist',
-  })
-  @UsePipes(ParseUUIDPipe)
-  addFavoriteTrack(@Param('id') id: string): string {
-    const track = this.trackService.findTrack(id);
+  // @Post('track/:id')
+  // @ApiCreatedResponse({
+  //   description: 'The track was successfully added to the favorites.',
+  // })
+  // @ApiBadRequestResponse({ description: 'Invalid Id' })
+  // @ApiUnprocessableEntityResponse({
+  //   description: 'Track with ID ${id} does not exist',
+  // })
+  // @UsePipes(ParseUUIDPipe)
+  // addFavoriteTrack(@Param('id') id: string): string {
+  //   const track = this.trackService.findTrack(id);
 
-    if (!track) {
-      throw new UnprocessableEntityException(
-        `Track with ID ${id} doesn't exist`,
-      );
-    }
+  //   if (!track) {
+  //     throw new UnprocessableEntityException(
+  //       `Track with ID ${id} doesn't exist`,
+  //     );
+  //   }
 
-    this.favoritesService.addToFavoriteByCategory('tracks', id);
+  //   this.favoritesService.addToFavoriteByCategory('tracks', id);
 
-    return `Track with ID ${id} was added to the favorites`;
-  }
+  //   return `Track with ID ${id} was added to the favorites`;
+  // }
 
-  @Delete('track/:id')
-  @ApiNoContentResponse({
-    description: 'Track with ID ${id} was deleted from favorites',
-  })
-  @ApiBadRequestResponse({ description: 'Invalid Id' })
-  @ApiNotFoundResponse({
-    description: 'Track with ID ${id} not found in favorites',
-  })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UsePipes(ParseUUIDPipe)
-  removeFavoriteTrack(@Param('id') id: string): string {
-    const categoryItemId = this.favoritesService.findFavoriteByCategory(
-      'tracks',
-      id,
-    );
+  // @Delete('track/:id')
+  // @ApiNoContentResponse({
+  //   description: 'Track with ID ${id} was deleted from favorites',
+  // })
+  // @ApiBadRequestResponse({ description: 'Invalid Id' })
+  // @ApiNotFoundResponse({
+  //   description: 'Track with ID ${id} not found in favorites',
+  // })
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // @UsePipes(ParseUUIDPipe)
+  // removeFavoriteTrack(@Param('id') id: string): string {
+  //   const categoryItemId = this.favoritesService.findFavoriteByCategory(
+  //     'tracks',
+  //     id,
+  //   );
 
-    if (!categoryItemId) {
-      throw new CommonNotFoundException(`Track with ID ${id} isn't favorite`);
-    }
+  //   if (!categoryItemId) {
+  //     throw new CommonNotFoundException(`Track with ID ${id} isn't favorite`);
+  //   }
 
-    this.favoritesService.removeFromFavoriteByCategory('tracks', id);
+  //   this.favoritesService.removeFromFavoriteByCategory('tracks', id);
 
-    return `Track with ID ${id} was deleted from favorites`;
-  }
+  //   return `Track with ID ${id} was deleted from favorites`;
+  // }
 
   // @Post('album/:id')
   // @ApiCreatedResponse({ description: 'The album was successfully added to the favorites.' })
