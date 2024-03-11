@@ -1,7 +1,7 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CommonNotFoundException } from 'src/exception/not-found.exception';
 import { ArtistDto } from './dto/artist.dto';
 import { Artist } from './entity/artist.entity';
@@ -28,6 +28,15 @@ export class ArtistService {
     }
 
     return artist;
+  }
+
+  async findArtistsByIds(ids: string[]): Promise<Artist[]> {
+    try {
+      return await this.artistRepository.findBy({ id: In(ids) })
+    } catch(error) {
+      console.log('Error finding artists: ', error)
+      return []
+    }
   }
 
   async createArtist(artistDto: ArtistDto): Promise<Artist> {

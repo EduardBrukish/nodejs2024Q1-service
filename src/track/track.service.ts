@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { TrackDto } from './dto/track.dto';
 import { Track } from './entity/track.entity';
 import { CommonNotFoundException } from '../exception/not-found.exception';
@@ -26,6 +26,15 @@ export class TrackService {
     }
 
     return track;
+  }
+
+  async findTracksByIds(ids: string[]): Promise<Track[]> {
+    try {
+      return await this.trackRepository.findBy({ id: In(ids) })
+    } catch(error) {
+      console.log('Error finding tracks: ', error)
+      return []
+    }
   }
 
   async createTrack(trackDto: TrackDto): Promise<Track> {

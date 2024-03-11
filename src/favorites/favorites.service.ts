@@ -1,12 +1,15 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, UnprocessableEntityException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import {
-  Favorites,
+  // Favorites,
   FavoriteCategories,
 } from './interfaces/favorites.interface';
 import { FavoritesResponseDto } from './dto/favorites.dto';
 import { TrackService } from '../track/track.service';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
+import { Favorites } from './entity/favorites.entity';
 
 @Injectable({})
 export class FavoritesService {
@@ -15,6 +18,7 @@ export class FavoritesService {
     @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
     @Inject(forwardRef(() => ArtistService))
     private artistService: ArtistService,
+    @InjectRepository(Favorites) private favoritesRepository: Repository<Favorites>,
   ) {}
 
   private favs: Favorites = {
@@ -24,25 +28,28 @@ export class FavoritesService {
   };
 
   async getFavorites(): Promise<FavoritesResponseDto> {
-    const tracksPromises = this.favs.tracks
-      .map(async (trackId) => await this.trackService.findTrack(trackId))
-      .filter((track) => Boolean(track));
-    const albumsPromises = this.favs.albums
-      .map(async (albumId) => await this.albumService.findAlbum(albumId))
-      .filter((album) => Boolean(album));
-    const artistsPromises = this.favs.artists
-      .map(async (artistId) => await this.artistService.findArtist(artistId))
-      .filter((artist) => Boolean(artist));
-
-    const favoritesTracks = await Promise.all(tracksPromises);
-    const favoritesAlbums = await Promise.all(albumsPromises);
-    const favoritesArtists = await Promise.all(artistsPromises);
+    const favoritesTracks = await this.trackService.findTracksByIds(this.favs.tracks);
+    const favoritesAlbums = await this.albumService.findAlbumsByIds(this.favs.albums);
+    const favoritesArtists = await this.artistService.findArtistsByIds(this.favs.artists);
 
     return {
       tracks: favoritesTracks,
       albums: favoritesAlbums,
       artists: favoritesArtists,
     };
+  }
+
+  async addFavoriteTrack(id: string): Promise<string> {
+    const track = await this.trackService.findTrack(id);
+
+    if (!track) {
+      throw new UnprocessableEntityException(
+        `Track with ID ${id} doesn't exist`,
+      );
+    }
+
+
+    return `Track with ID ${id} was added to the favorites`;
   }
 
   findFavoriteByCategory(category: FavoriteCategories, id: string) {

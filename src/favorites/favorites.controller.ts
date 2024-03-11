@@ -42,28 +42,18 @@ export class FavoritesController {
     return await this.favoritesService.getFavorites();
   }
 
-  // @Post('track/:id')
-  // @ApiCreatedResponse({
-  //   description: 'The track was successfully added to the favorites.',
-  // })
-  // @ApiBadRequestResponse({ description: 'Invalid Id' })
-  // @ApiUnprocessableEntityResponse({
-  //   description: 'Track with ID ${id} does not exist',
-  // })
-  // @UsePipes(ParseUUIDPipe)
-  // addFavoriteTrack(@Param('id') id: string): string {
-  //   const track = this.trackService.findTrack(id);
-
-  //   if (!track) {
-  //     throw new UnprocessableEntityException(
-  //       `Track with ID ${id} doesn't exist`,
-  //     );
-  //   }
-
-  //   this.favoritesService.addToFavoriteByCategory('tracks', id);
-
-  //   return `Track with ID ${id} was added to the favorites`;
-  // }
+  @Post('track/:id')
+  @ApiCreatedResponse({
+    description: 'The track was successfully added to the favorites.',
+  })
+  @ApiBadRequestResponse({ description: 'Invalid Id' })
+  @ApiUnprocessableEntityResponse({
+    description: 'Track with ID ${id} does not exist',
+  })
+  @UsePipes(ParseUUIDPipe)
+  async addFavoriteTrack(@Param('id') id: string): Promise<string> {
+    return await this.favoritesService.addFavoriteTrack(id)
+  }
 
   // @Delete('track/:id')
   // @ApiNoContentResponse({

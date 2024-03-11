@@ -1,7 +1,7 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AlbumDto } from './dto/album.dto';
 import { Album } from './entity/album.entity';
 import { TrackService } from '../track/track.service';
@@ -28,6 +28,15 @@ export class AlbumService {
     }
 
     return album;
+  }
+
+  async findAlbumsByIds(ids: string[]): Promise<Album[]> {
+    try {
+      return await this.albumRepository.findBy({ id: In(ids) })
+    } catch(error) {
+      console.log('Error finding albums: ', error)
+      return []
+    }
   }
 
   async createAlbum(albumDto: AlbumDto): Promise<Album> {
