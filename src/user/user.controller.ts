@@ -37,7 +37,7 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [UserDto] })
-  getUsers(): Promise<User[]> {
+  getUsers(): Promise<UserDto[]> {
     return this.userService.getUsers();
   }
 
@@ -66,7 +66,7 @@ export class UserController {
     description: 'Body does not contain required fields',
   })
   @HttpCode(HttpStatus.CREATED)
-  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     const newUser = this.userService.createUser(createUserDto);
     return newUser;
   }
@@ -80,11 +80,11 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User with ID ${id} not found' })
   @ApiForbiddenResponse({ description: 'Wrong user password' })
   @UsePipes(new ValidationPipe())
-  updateUserPassword(
+  async updateUserPassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateUserPasswordDto: UpdatePasswordDto,
-  ): Promise<User> {
-    return this.userService.updateUserPassword(id, updateUserPasswordDto);
+  ): Promise<UserDto> {
+    return await this.userService.updateUserPassword(id, updateUserPasswordDto);
   }
 
   @Delete(':id')

@@ -44,7 +44,6 @@ export class ArtistController {
   @ApiNotFoundResponse({ description: 'Artist with ID ${id} not found' })
   @UsePipes(ParseUUIDPipe)
   async getArtist(@Param('id') id: string): Promise<Artist> {
-    console.log('controller', id);
     return await this.artistService.findArtist(id);
   }
 
