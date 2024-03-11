@@ -32,7 +32,7 @@ npm install
 ## Add env file
 
 ```
-app PORT value to the env file according .env.example file
+Create .env file. Add PORT value to the .env file according .env.example file
 ```
 
 ## Running application
