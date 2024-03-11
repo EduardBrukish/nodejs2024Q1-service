@@ -66,24 +66,15 @@ export class AlbumService {
     }
 
     await this.albumRepository.delete(id);
-    // ToDo remove album data from track
-    // this.trackService.removeAlbumDataFromTrack(id);
+    await this.trackService.removeAlbumDataFromTrack(id);
   }
 
   async removeArtistDataFromAlbum(artistId: string) {
-    const albumsToUpdate = await this.albumRepository.find({
-      where: { artistId },
-    });
-
-    if (!albumsToUpdate.length) {
-      throw new CommonNotFoundException(`Artist with ID ${artistId} not found`);
-    }
-
-    for (const albumToUpdate of albumsToUpdate) {
-      const updatedAlbum = Object.assign({}, albumToUpdate);
-      updatedAlbum.artistId = null;
-
-      await this.albumRepository.save(updatedAlbum);
-    }
+    await this.albumRepository
+      .createQueryBuilder()
+      .update(Album)
+      .set({ artistId: null })
+      .where({ artistId })
+      .execute()
   }
 }

@@ -67,22 +67,21 @@ export class TrackService {
     await this.trackRepository.delete(id);
   }
 
-  // ToDo remove artist and album data from track
-  removeArtistDataFromTrack(artistId: string) {
-    this.tracks = this.tracks.map((track) => {
-      if (track.artistId === artistId) {
-        return { ...track, artistId: null };
-      }
-      return track;
-    });
+  async removeArtistDataFromTrack(artistId: string) {
+    await this.trackRepository
+      .createQueryBuilder()
+      .update(Track)
+      .set({ artistId: null })
+      .where({ artistId })
+      .execute()
   }
 
-  removeAlbumDataFromTrack(albumId: string) {
-    this.tracks = this.tracks.map((track) => {
-      if (track.albumId === albumId) {
-        return { ...track, albumId: null };
-      }
-      return track;
-    });
+  async removeAlbumDataFromTrack(albumId: string) {
+    await this.trackRepository
+      .createQueryBuilder()
+      .update(Track)
+      .set({ albumId: null })
+      .where({ albumId })
+      .execute()
   }
 }

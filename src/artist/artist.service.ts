@@ -59,15 +59,14 @@ export class ArtistService {
   }
 
   async deleteArtist(id: string) {
-    const artist = this.artistRepository.findOne({ where: { id } });
+    const artist = await this.artistRepository.findOne({ where: { id } });
 
     if (!artist) {
       throw new CommonNotFoundException(`Artist with ID ${id} not found`);
     }
 
-    // this.trackService.removeArtistDataFromTrack(id);
-
-    await this.albumService.removeArtistDataFromAlbum(id);
     await this.artistRepository.delete(id);
+    await this.trackService.removeArtistDataFromTrack(id);
+    await this.albumService.removeArtistDataFromAlbum(id);
   }
 }
