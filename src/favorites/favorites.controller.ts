@@ -19,20 +19,12 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
-import { TrackService } from '../track/track.service';
 import { FavoritesResponseDto } from './dto/favorites.dto';
-import { AlbumService } from '../album/album.service';
-import { ArtistService } from '../artist/artist.service';
 
 @ApiTags('Favorites')
 @Controller('favs')
 export class FavoritesController {
-  constructor(
-    private favoritesService: FavoritesService,
-    private trackService: TrackService,
-    private albumService: AlbumService,
-    private artistService: ArtistService,
-  ) {}
+  constructor(private favoritesService: FavoritesService) {}
 
   @Get()
   @ApiOkResponse({ type: [FavoritesResponseDto] })

@@ -60,146 +60,146 @@ export class FavoritesService {
   }
 
   async addFavoriteTrack(id: string): Promise<string> {
-    const track = await this.trackService.findTrack(id);
+    try {
+      const track = await this.trackService.findTrack(id);
 
-    if (!track) {
+      const favorites = await this.favoritesRepository.findOne({
+        where: { id: FAVORITES_REPOSITORY_NAME },
+      });
+      const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+      const favoritesToSave = Object.assign({}, dataToGetFavorites);
+      favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+      favoritesToSave.tracks = [...dataToGetFavorites.tracks, track.id];
+
+      await this.favoritesRepository.save(favoritesToSave);
+
+      return `Track with ID ${id} was added to the favorites`;
+    } catch {
       throw new UnprocessableEntityException(
         `Track with ID ${id} doesn't exist`,
       );
     }
-
-    const favorites = await this.favoritesRepository.findOne({
-      where: { id: FAVORITES_REPOSITORY_NAME },
-    });
-    const dataToGetFavorites = favorites || MOCK_FAVORITES;
-
-    const favoritesToSave = Object.assign({}, dataToGetFavorites);
-    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
-    favoritesToSave.tracks = [...dataToGetFavorites.tracks, track.id];
-
-    await this.favoritesRepository.save(favoritesToSave);
-
-    return `Track with ID ${id} was added to the favorites`;
   }
 
   async deleteFavoriteTrack(id: string): Promise<string> {
-    const track = await this.trackService.findTrack(id);
+    try {
+      const track = await this.trackService.findTrack(id);
 
-    if (!track) {
+      const favorites = await this.favoritesRepository.findOne({
+        where: { id: FAVORITES_REPOSITORY_NAME },
+      });
+      const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+      const favoritesToSave = Object.assign({}, dataToGetFavorites);
+      favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+      favoritesToSave.tracks = favorites.tracks.filter(
+        (favoriteTrackId) => favoriteTrackId !== track.id,
+      );
+
+      await this.favoritesRepository.save(favoritesToSave);
+
+      return `Track with ID ${id} was deleted from the favorites`;
+    } catch {
       throw new UnprocessableEntityException(
         `Track with ID ${id} doesn't exist`,
       );
     }
-
-    const favorites = await this.favoritesRepository.findOne({
-      where: { id: FAVORITES_REPOSITORY_NAME },
-    });
-    const dataToGetFavorites = favorites || MOCK_FAVORITES;
-
-    const favoritesToSave = Object.assign({}, dataToGetFavorites);
-    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
-    favoritesToSave.tracks = favorites.tracks.filter(
-      (favoriteTrackId) => favoriteTrackId !== track.id,
-    );
-
-    await this.favoritesRepository.save(favoritesToSave);
-
-    return `Track with ID ${id} was deleted from the favorites`;
   }
 
   async addFavoriteArtist(id: string): Promise<string> {
-    const artist = await this.artistService.findArtist(id);
+    try {
+      const artist = await this.artistService.findArtist(id);
 
-    if (!artist) {
+      const favorites = await this.favoritesRepository.findOne({
+        where: { id: FAVORITES_REPOSITORY_NAME },
+      });
+      const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+      const favoritesToSave = Object.assign({}, dataToGetFavorites);
+      favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+      favoritesToSave.artists = [...dataToGetFavorites.artists, artist.id];
+
+      await this.favoritesRepository.save(favoritesToSave);
+
+      return `Artist with ID ${id} was added to the favorites`;
+    } catch {
       throw new UnprocessableEntityException(
         `Track with ID ${id} doesn't exist`,
       );
     }
-
-    const favorites = await this.favoritesRepository.findOne({
-      where: { id: FAVORITES_REPOSITORY_NAME },
-    });
-    const dataToGetFavorites = favorites || MOCK_FAVORITES;
-
-    const favoritesToSave = Object.assign({}, dataToGetFavorites);
-    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
-    favoritesToSave.artists = [...dataToGetFavorites.artists, artist.id];
-
-    await this.favoritesRepository.save(favoritesToSave);
-
-    return `Artist with ID ${id} was added to the favorites`;
   }
 
   async deleteFavoriteArtist(id: string): Promise<string> {
-    const artist = await this.artistService.findArtist(id);
+    try {
+      const artist = await this.artistService.findArtist(id);
 
-    if (!artist) {
+      const favorites = await this.favoritesRepository.findOne({
+        where: { id: FAVORITES_REPOSITORY_NAME },
+      });
+      const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+      const favoritesToSave = Object.assign({}, dataToGetFavorites);
+      favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+      favoritesToSave.artists = dataToGetFavorites.artists.filter(
+        (favoriteArtistId) => favoriteArtistId !== artist.id,
+      );
+
+      await this.favoritesRepository.save(favoritesToSave);
+
+      return `Track with ID ${id} was deleted from the favorites`;
+    } catch {
       throw new UnprocessableEntityException(
         `Artist with ID ${id} doesn't exist`,
       );
     }
-
-    const favorites = await this.favoritesRepository.findOne({
-      where: { id: FAVORITES_REPOSITORY_NAME },
-    });
-    const dataToGetFavorites = favorites || MOCK_FAVORITES;
-
-    const favoritesToSave = Object.assign({}, dataToGetFavorites);
-    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
-    favoritesToSave.artists = dataToGetFavorites.artists.filter(
-      (favoriteArtistId) => favoriteArtistId !== artist.id,
-    );
-
-    await this.favoritesRepository.save(favoritesToSave);
-
-    return `Track with ID ${id} was deleted from the favorites`;
   }
 
   async addFavoriteAlbum(id: string): Promise<string> {
-    const album = await this.albumService.findAlbum(id);
+    try {
+      const album = await this.albumService.findAlbum(id);
 
-    if (!album) {
+      const favorites = await this.favoritesRepository.findOne({
+        where: { id: FAVORITES_REPOSITORY_NAME },
+      });
+      const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+      const favoritesToSave = Object.assign({}, dataToGetFavorites);
+      favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+      favoritesToSave.albums = [...dataToGetFavorites.albums, album.id];
+
+      await this.favoritesRepository.save(favoritesToSave);
+
+      return `Album with ID ${id} was added to the favorites`;
+    } catch {
       throw new UnprocessableEntityException(
         `Album with ID ${id} doesn't exist`,
       );
     }
-
-    const favorites = await this.favoritesRepository.findOne({
-      where: { id: FAVORITES_REPOSITORY_NAME },
-    });
-    const dataToGetFavorites = favorites || MOCK_FAVORITES;
-
-    const favoritesToSave = Object.assign({}, dataToGetFavorites);
-    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
-    favoritesToSave.albums = [...dataToGetFavorites.albums, album.id];
-
-    await this.favoritesRepository.save(favoritesToSave);
-
-    return `Album with ID ${id} was added to the favorites`;
   }
 
   async deleteFavoriteAlbum(id: string): Promise<string> {
-    const album = await this.albumService.findAlbum(id);
+    try {
+      const album = await this.albumService.findAlbum(id);
 
-    if (!album) {
+      const favorites = await this.favoritesRepository.findOne({
+        where: { id: FAVORITES_REPOSITORY_NAME },
+      });
+      const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+      const favoritesToSave = Object.assign({}, dataToGetFavorites);
+      favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+      favoritesToSave.albums = favorites.albums.filter(
+        (favoriteAlbumId) => favoriteAlbumId !== album.id,
+      );
+
+      await this.favoritesRepository.save(favoritesToSave);
+
+      return `Album with ID ${id} was deleted from the favorites`;
+    } catch {
       throw new UnprocessableEntityException(
         `Album with ID ${id} doesn't exist`,
       );
     }
-
-    const favorites = await this.favoritesRepository.findOne({
-      where: { id: FAVORITES_REPOSITORY_NAME },
-    });
-    const dataToGetFavorites = favorites || MOCK_FAVORITES;
-
-    const favoritesToSave = Object.assign({}, dataToGetFavorites);
-    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
-    favoritesToSave.albums = favorites.albums.filter(
-      (favoriteAlbumId) => favoriteAlbumId !== album.id,
-    );
-
-    await this.favoritesRepository.save(favoritesToSave);
-
-    return `Album with ID ${id} was deleted from the favorites`;
   }
 }
