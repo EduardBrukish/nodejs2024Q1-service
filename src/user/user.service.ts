@@ -15,11 +15,16 @@ export class UserService {
   ) {}
 
   async getUsers(): Promise<UserDto[]> {
-    return await this.userRepository.find({select: ['id', 'login', 'version', 'updatedAt', 'createdAt']});
+    return await this.userRepository.find({
+      select: ['id', 'login', 'version', 'updatedAt', 'createdAt'],
+    });
   }
 
   async findUser(id: string): Promise<User | undefined> {
-    const user = await this.userRepository.findOne({ where: { id }, select: ['id', 'login', 'version', 'updatedAt', 'createdAt'] });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'login', 'version', 'updatedAt', 'createdAt'],
+    });
 
     if (!user) {
       throw new CommonNotFoundException(`User with ID ${id} not found`);
@@ -40,8 +45,8 @@ export class UserService {
     const userToSave = await this.userRepository.create(newUser);
     const savedUser = await this.userRepository.save(userToSave);
 
-    const {password, ...user} = savedUser
-    return user
+    const { password, ...user } = savedUser;
+    return user;
   }
 
   async updateUserPassword(
@@ -65,7 +70,7 @@ export class UserService {
 
     const savedUser = await this.userRepository.save(updatedUser);
 
-    const {password, ...userToReturn} = savedUser;
+    const { password, ...userToReturn } = savedUser;
     return userToReturn;
   }
 

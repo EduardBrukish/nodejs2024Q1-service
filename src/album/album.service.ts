@@ -5,7 +5,8 @@ import { In, Repository } from 'typeorm';
 import { AlbumDto } from './dto/album.dto';
 import { Album } from './entity/album.entity';
 import { TrackService } from '../track/track.service';
-import { CommonNotFoundException } from '../exception/not-found.exception';
+import { getEntityById } from '../helpers/getEntityById';
+import { deleteEntityById } from '../helpers/deleteEntityById';
 
 @Injectable()
 export class AlbumService {
@@ -14,28 +15,20 @@ export class AlbumService {
     @InjectRepository(Album) private albumRepository: Repository<Album>,
   ) {}
 
-  private albums: Album[] = [];
-
   async getAlbums(): Promise<Album[]> {
     return await this.albumRepository.find();
   }
 
   async findAlbum(id: string): Promise<Album> {
-    const album = await this.albumRepository.findOne({ where: { id } });
-
-    if (!album) {
-      throw new CommonNotFoundException(`Album with ID ${id} not found`);
-    }
-
-    return album;
+    return await getEntityById<Album>(this.albumRepository, id);
   }
 
   async findAlbumsByIds(ids: string[]): Promise<Album[]> {
     try {
-      return await this.albumRepository.findBy({ id: In(ids) })
-    } catch(error) {
-      console.log('Error finding albums: ', error)
-      return []
+      return await this.albumRepository.findBy({ id: In(ids) });
+    } catch (error) {
+      console.log('Error finding albums: ', error);
+      return [];
     }
   }
 
@@ -53,11 +46,7 @@ export class AlbumService {
   }
 
   async updateAlbum(id: string, albumDto: AlbumDto): Promise<Album> {
-    const album = await this.albumRepository.findOne({ where: { id } });
-
-    if (!album) {
-      throw new CommonNotFoundException(`Album with ID ${id} not found`);
-    }
+    const album = await getEntityById<Album>(this.albumRepository, id);
 
     const updatedAlbum = Object.assign({}, album);
     updatedAlbum.name = albumDto.name;
@@ -68,14 +57,11 @@ export class AlbumService {
   }
 
   async deleteAlbum(id: string): Promise<void> {
-    const album = await this.albumRepository.findOne({ where: { id } });
+    const isSuccess = await deleteEntityById<Album>(this.albumRepository, id);
 
-    if (!album) {
-      throw new CommonNotFoundException(`Album with ID ${id} not found`);
+    if (isSuccess) {
+      await this.trackService.removeAlbumDataFromTrack(id);
     }
-
-    await this.albumRepository.delete(id);
-    await this.trackService.removeAlbumDataFromTrack(id);
   }
 
   async removeArtistDataFromAlbum(artistId: string) {
@@ -84,6 +70,6 @@ export class AlbumService {
       .update(Album)
       .set({ artistId: null })
       .where({ artistId })
-      .execute()
+      .execute();
   }
 }

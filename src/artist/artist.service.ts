@@ -2,11 +2,12 @@ import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { CommonNotFoundException } from 'src/exception/not-found.exception';
 import { ArtistDto } from './dto/artist.dto';
 import { Artist } from './entity/artist.entity';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
+import { getEntityById } from '../helpers/getEntityById';
+import { deleteEntityById } from '../helpers/deleteEntityById';
 
 @Injectable()
 export class ArtistService {
@@ -21,21 +22,15 @@ export class ArtistService {
   }
 
   async findArtist(id: string): Promise<Artist> {
-    const artist = await this.artistRepository.findOne({ where: { id } });
-
-    if (!artist) {
-      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
-    }
-
-    return artist;
+    return await getEntityById<Artist>(this.artistRepository, id);
   }
 
   async findArtistsByIds(ids: string[]): Promise<Artist[]> {
     try {
-      return await this.artistRepository.findBy({ id: In(ids) })
-    } catch(error) {
-      console.log('Error finding artists: ', error)
-      return []
+      return await this.artistRepository.findBy({ id: In(ids) });
+    } catch (error) {
+      console.log('Error finding artists: ', error);
+      return [];
     }
   }
 
@@ -52,13 +47,10 @@ export class ArtistService {
   }
 
   async updateArtist(id: string, artistDto: ArtistDto): Promise<Artist> {
-    const artistToUpdate = await this.artistRepository.findOne({
-      where: { id },
-    });
-
-    if (!artistToUpdate) {
-      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
-    }
+    const artistToUpdate = await getEntityById<Artist>(
+      this.artistRepository,
+      id,
+    );
 
     const updatedArtist = Object.assign({}, artistToUpdate);
     updatedArtist.name = artistDto.name;
@@ -68,14 +60,11 @@ export class ArtistService {
   }
 
   async deleteArtist(id: string) {
-    const artist = await this.artistRepository.findOne({ where: { id } });
+    const isSuccess = await deleteEntityById<Artist>(this.artistRepository, id);
 
-    if (!artist) {
-      throw new CommonNotFoundException(`Artist with ID ${id} not found`);
+    if (isSuccess) {
+      await this.trackService.removeArtistDataFromTrack(id);
+      await this.albumService.removeArtistDataFromAlbum(id);
     }
-
-    await this.artistRepository.delete(id);
-    await this.trackService.removeArtistDataFromTrack(id);
-    await this.albumService.removeArtistDataFromAlbum(id);
   }
 }

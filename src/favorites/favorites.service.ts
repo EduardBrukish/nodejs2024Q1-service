@@ -1,15 +1,24 @@
-import { Injectable, Inject, forwardRef, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  // Favorites,
-  FavoriteCategories,
-} from './interfaces/favorites.interface';
 import { FavoritesResponseDto } from './dto/favorites.dto';
 import { TrackService } from '../track/track.service';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { Favorites } from './entity/favorites.entity';
+
+const FAVORITES_REPOSITORY_NAME = 'favorites';
+const MOCK_FAVORITES = {
+  id: FAVORITES_REPOSITORY_NAME,
+  artists: [],
+  albums: [],
+  tracks: [],
+};
 
 @Injectable({})
 export class FavoritesService {
@@ -18,19 +27,30 @@ export class FavoritesService {
     @Inject(forwardRef(() => AlbumService)) private albumService: AlbumService,
     @Inject(forwardRef(() => ArtistService))
     private artistService: ArtistService,
-    @InjectRepository(Favorites) private favoritesRepository: Repository<Favorites>,
+    @InjectRepository(Favorites)
+    private favoritesRepository: Repository<Favorites>,
   ) {}
 
-  private favs: Favorites = {
-    artists: [],
-    albums: [],
-    tracks: [],
-  };
-
   async getFavorites(): Promise<FavoritesResponseDto> {
-    const favoritesTracks = await this.trackService.findTracksByIds(this.favs.tracks);
-    const favoritesAlbums = await this.albumService.findAlbumsByIds(this.favs.albums);
-    const favoritesArtists = await this.artistService.findArtistsByIds(this.favs.artists);
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+    const favoritesTracks = await this.trackService.findTracksByIds(
+      dataToGetFavorites.tracks,
+    );
+    const favoritesAlbums = await this.albumService.findAlbumsByIds(
+      dataToGetFavorites.albums,
+    );
+    const favoritesArtists = await this.artistService.findArtistsByIds(
+      dataToGetFavorites.artists,
+    );
+
+    if (!favoritesTracks || !favoritesAlbums || !favoritesArtists) {
+      throw new UnprocessableEntityException(`One of the IDs are not valid`);
+    }
 
     return {
       tracks: favoritesTracks,
@@ -48,24 +68,138 @@ export class FavoritesService {
       );
     }
 
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+    const favoritesToSave = Object.assign({}, dataToGetFavorites);
+    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+    favoritesToSave.tracks = [...dataToGetFavorites.tracks, track.id];
+
+    await this.favoritesRepository.save(favoritesToSave);
 
     return `Track with ID ${id} was added to the favorites`;
   }
 
-  findFavoriteByCategory(category: FavoriteCategories, id: string) {
-    const categoryToSearch: string[] = this.favs[category];
+  async deleteFavoriteTrack(id: string): Promise<string> {
+    const track = await this.trackService.findTrack(id);
 
-    return categoryToSearch.find((categoryItemId) => categoryItemId === id);
-  }
+    if (!track) {
+      throw new UnprocessableEntityException(
+        `Track with ID ${id} doesn't exist`,
+      );
+    }
 
-  addToFavoriteByCategory(category: FavoriteCategories, id: string) {
-    this.favs = { ...this.favs, [category]: [...this.favs[category], id] };
-  }
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
 
-  removeFromFavoriteByCategory(category: FavoriteCategories, id: string) {
-    const updatedCategory = this.favs[category].filter(
-      (itemId) => itemId !== id,
+    const favoritesToSave = Object.assign({}, dataToGetFavorites);
+    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+    favoritesToSave.tracks = favorites.tracks.filter(
+      (favoriteTrackId) => favoriteTrackId !== track.id,
     );
-    this.favs = { ...this.favs, [category]: updatedCategory };
+
+    await this.favoritesRepository.save(favoritesToSave);
+
+    return `Track with ID ${id} was deleted from the favorites`;
+  }
+
+  async addFavoriteArtist(id: string): Promise<string> {
+    const artist = await this.artistService.findArtist(id);
+
+    if (!artist) {
+      throw new UnprocessableEntityException(
+        `Track with ID ${id} doesn't exist`,
+      );
+    }
+
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+    const favoritesToSave = Object.assign({}, dataToGetFavorites);
+    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+    favoritesToSave.artists = [...dataToGetFavorites.artists, artist.id];
+
+    await this.favoritesRepository.save(favoritesToSave);
+
+    return `Artist with ID ${id} was added to the favorites`;
+  }
+
+  async deleteFavoriteArtist(id: string): Promise<string> {
+    const artist = await this.artistService.findArtist(id);
+
+    if (!artist) {
+      throw new UnprocessableEntityException(
+        `Artist with ID ${id} doesn't exist`,
+      );
+    }
+
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+    const favoritesToSave = Object.assign({}, dataToGetFavorites);
+    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+    favoritesToSave.artists = dataToGetFavorites.artists.filter(
+      (favoriteArtistId) => favoriteArtistId !== artist.id,
+    );
+
+    await this.favoritesRepository.save(favoritesToSave);
+
+    return `Track with ID ${id} was deleted from the favorites`;
+  }
+
+  async addFavoriteAlbum(id: string): Promise<string> {
+    const album = await this.albumService.findAlbum(id);
+
+    if (!album) {
+      throw new UnprocessableEntityException(
+        `Album with ID ${id} doesn't exist`,
+      );
+    }
+
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+    const favoritesToSave = Object.assign({}, dataToGetFavorites);
+    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+    favoritesToSave.albums = [...dataToGetFavorites.albums, album.id];
+
+    await this.favoritesRepository.save(favoritesToSave);
+
+    return `Album with ID ${id} was added to the favorites`;
+  }
+
+  async deleteFavoriteAlbum(id: string): Promise<string> {
+    const album = await this.albumService.findAlbum(id);
+
+    if (!album) {
+      throw new UnprocessableEntityException(
+        `Album with ID ${id} doesn't exist`,
+      );
+    }
+
+    const favorites = await this.favoritesRepository.findOne({
+      where: { id: FAVORITES_REPOSITORY_NAME },
+    });
+    const dataToGetFavorites = favorites || MOCK_FAVORITES;
+
+    const favoritesToSave = Object.assign({}, dataToGetFavorites);
+    favoritesToSave.id = FAVORITES_REPOSITORY_NAME;
+    favoritesToSave.albums = favorites.albums.filter(
+      (favoriteAlbumId) => favoriteAlbumId !== album.id,
+    );
+
+    await this.favoritesRepository.save(favoritesToSave);
+
+    return `Album with ID ${id} was deleted from the favorites`;
   }
 }

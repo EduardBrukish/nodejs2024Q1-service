@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { TrackDto } from './dto/track.dto';
 import { Track } from './entity/track.entity';
-import { CommonNotFoundException } from '../exception/not-found.exception';
+import { getEntityById } from '../helpers/getEntityById';
+import { deleteEntityById } from '../helpers/deleteEntityById';
 
 @Injectable()
 export class TrackService {
@@ -12,28 +13,20 @@ export class TrackService {
     @InjectRepository(Track) private trackRepository: Repository<Track>,
   ) {}
 
-  private tracks: Track[] = [];
-
   async getTracks(): Promise<Track[]> {
     return await this.trackRepository.find();
   }
 
   async findTrack(id: string): Promise<Track> {
-    const track = await this.trackRepository.findOne({ where: { id } });
-
-    if (!track) {
-      throw new CommonNotFoundException(`Track with ID ${id} not found`);
-    }
-
-    return track;
+    return await getEntityById<Track>(this.trackRepository, id);
   }
 
   async findTracksByIds(ids: string[]): Promise<Track[]> {
     try {
-      return await this.trackRepository.findBy({ id: In(ids) })
-    } catch(error) {
-      console.log('Error finding tracks: ', error)
-      return []
+      return await this.trackRepository.findBy({ id: In(ids) });
+    } catch (error) {
+      console.log('Error finding tracks: ', error);
+      return [];
     }
   }
 
@@ -51,11 +44,7 @@ export class TrackService {
   }
 
   async updateTrack(id: string, trackDto: TrackDto): Promise<Track> {
-    const track = await this.trackRepository.findOne({ where: { id } });
-
-    if (!track) {
-      throw new CommonNotFoundException(`Track with ID ${id} not found`);
-    }
+    const track = await getEntityById<Track>(this.trackRepository, id);
 
     const clonedTrack = Object.assign({}, track);
     clonedTrack.name = trackDto.name;
@@ -66,14 +55,8 @@ export class TrackService {
     return await this.trackRepository.save(clonedTrack);
   }
 
-  async deleteTrack(id: string): Promise<void> {
-    const track = await this.trackRepository.findOne({ where: { id } });
-
-    if (!track) {
-      throw new CommonNotFoundException(`Track with ID ${id} not found`);
-    }
-
-    await this.trackRepository.delete(id);
+  async deleteTrack(id: string): Promise<boolean> {
+    return await deleteEntityById<Track>(this.trackRepository, id);
   }
 
   async removeArtistDataFromTrack(artistId: string) {
@@ -82,7 +65,7 @@ export class TrackService {
       .update(Track)
       .set({ artistId: null })
       .where({ artistId })
-      .execute()
+      .execute();
   }
 
   async removeAlbumDataFromTrack(albumId: string) {
@@ -91,6 +74,6 @@ export class TrackService {
       .update(Track)
       .set({ albumId: null })
       .where({ albumId })
-      .execute()
+      .execute();
   }
 }
