@@ -25,7 +25,7 @@ import { FavoritesModule } from './favorites/favorites.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       entities: [],
-      synchronize: true,
+      synchronize: false,
       autoLoadEntities: true,
       parseInt8: true,
     }),
