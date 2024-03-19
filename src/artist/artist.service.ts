@@ -35,7 +35,7 @@ export class ArtistService {
   }
 
   async createArtist(artistDto: ArtistDto): Promise<Artist> {
-    const newArtist = {} as Artist;
+    const newArtist = new Artist();
 
     newArtist.id = uuidv4();
     newArtist.name = artistDto.name;
@@ -60,11 +60,6 @@ export class ArtistService {
   }
 
   async deleteArtist(id: string) {
-    const isSuccess = await deleteEntityById<Artist>(this.artistRepository, id);
-
-    if (isSuccess) {
-      await this.trackService.removeArtistDataFromTrack(id);
-      await this.albumService.removeArtistDataFromAlbum(id);
-    }
+    await deleteEntityById<Artist>(this.artistRepository, id);
   }
 }

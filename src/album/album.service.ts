@@ -20,7 +20,8 @@ export class AlbumService {
   }
 
   async findAlbum(id: string): Promise<Album> {
-    return await getEntityById<Album>(this.albumRepository, id);
+    const relations = { artist: true }
+    return await getEntityById<Album>(this.albumRepository, id, relations);
   }
 
   async findAlbumsByIds(ids: string[]): Promise<Album[]> {
@@ -33,7 +34,7 @@ export class AlbumService {
   }
 
   async createAlbum(albumDto: AlbumDto): Promise<Album> {
-    const newAlbum = {} as Album;
+    const newAlbum = new Album();
 
     newAlbum.id = uuidv4();
     newAlbum.name = albumDto.name;
@@ -57,19 +58,6 @@ export class AlbumService {
   }
 
   async deleteAlbum(id: string): Promise<void> {
-    const isSuccess = await deleteEntityById<Album>(this.albumRepository, id);
-
-    if (isSuccess) {
-      await this.trackService.removeAlbumDataFromTrack(id);
-    }
-  }
-
-  async removeArtistDataFromAlbum(artistId: string) {
-    await this.albumRepository
-      .createQueryBuilder()
-      .update(Album)
-      .set({ artistId: null })
-      .where({ artistId })
-      .execute();
+    await deleteEntityById<Album>(this.albumRepository, id);
   }
 }

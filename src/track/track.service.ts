@@ -31,7 +31,7 @@ export class TrackService {
   }
 
   async createTrack(trackDto: TrackDto): Promise<Track> {
-    const newTrack = {} as Track;
+    const newTrack = new Track();
     newTrack.id = uuidv4();
     newTrack.name = trackDto.name;
     newTrack.albumId = trackDto.albumId ?? null;
@@ -65,15 +65,6 @@ export class TrackService {
       .update(Track)
       .set({ artistId: null })
       .where({ artistId })
-      .execute();
-  }
-
-  async removeAlbumDataFromTrack(albumId: string) {
-    await this.trackRepository
-      .createQueryBuilder()
-      .update(Track)
-      .set({ albumId: null })
-      .where({ albumId })
       .execute();
   }
 }
