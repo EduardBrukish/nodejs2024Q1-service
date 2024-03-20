@@ -3,5 +3,3 @@ export interface Favorites {
   albums: string[];
   tracks: string[];
 }
-
-export type FavoriteCategories = 'albums' | 'artists' | 'tracks';

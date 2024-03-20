@@ -20,7 +20,7 @@ export class AlbumService {
   }
 
   async findAlbum(id: string): Promise<Album> {
-    const relations = { artist: true }
+    const relations = { artist: true };
     return await getEntityById<Album>(this.albumRepository, id, relations);
   }
 
