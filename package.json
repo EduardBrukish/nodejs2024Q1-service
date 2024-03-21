@@ -23,7 +23,8 @@
     "typeorm": "typeorm-ts-node-commonjs --dataSource src/typeorm.config.ts",
     "migration:generate": "npm run typeorm migration:generate src/migrations/auto",
     "migrate": "npm run typeorm migration:run",
-    "migrate:revert": "npm run typeorm migration:revert"
+    "migrate:revert": "npm run typeorm migration:revert",
+    "scan:containers": "docker scout cves"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
