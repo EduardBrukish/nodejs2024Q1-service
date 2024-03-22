@@ -11,7 +11,7 @@
 ## Downloading
 
 ```
-git clone git@github.com:EduardBrukish/nodejs2023Q2-service.git
+git clone git@github.com:EduardBrukish/nodejs2024Q1-service.git
 ```
 
 ## Go to the project folder
