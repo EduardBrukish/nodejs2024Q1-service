@@ -27,13 +27,18 @@ export class FavoritesService {
   async getFavorites(): Promise<FavoritesResponseDto> {
     const favorites = await this.favoritesRepository.find();
 
-    const favoritesIdsByCategories = favorites.reduce((acc, entity) => {
-      const idValue = Object.entries(entity).find(([key, id]) => (key !== 'id' && Boolean(id)))
+    const favoritesIdsByCategories = favorites.reduce(
+      (acc, entity) => {
+        const idValue = Object.entries(entity).find(
+          ([key, id]) => key !== 'id' && Boolean(id),
+        );
 
-      if(!idValue) return acc
-      const [category, id] = idValue
-      return {...acc, [category]: [...acc[category], id]  }
-    }, {trackId: [], albumId: [], artistId: []})
+        if (!idValue) return acc;
+        const [category, id] = idValue;
+        return { ...acc, [category]: [...acc[category], id] };
+      },
+      { trackId: [], albumId: [], artistId: [] },
+    );
 
     const favoritesTracks = await this.trackService.findTracksByIds(
       favoritesIdsByCategories.trackId,
@@ -58,7 +63,7 @@ export class FavoritesService {
 
   async addFavoriteTrack(id: string): Promise<string> {
     try {
-      await createFavoriteByCategory(this.favoritesRepository, id, 'trackId')
+      await createFavoriteByCategory(this.favoritesRepository, id, 'trackId');
 
       return `Track with ID ${id} was added to the favorites`;
     } catch {
@@ -82,7 +87,7 @@ export class FavoritesService {
 
   async addFavoriteArtist(id: string): Promise<string> {
     try {
-      await createFavoriteByCategory(this.favoritesRepository, id, 'artistId')
+      await createFavoriteByCategory(this.favoritesRepository, id, 'artistId');
 
       return `Artist with ID ${id} was added to the favorites`;
     } catch {
@@ -106,7 +111,7 @@ export class FavoritesService {
 
   async addFavoriteAlbum(id: string): Promise<string> {
     try {
-      await createFavoriteByCategory(this.favoritesRepository, id, 'albumId')
+      await createFavoriteByCategory(this.favoritesRepository, id, 'albumId');
 
       return `Album with ID ${id} was added to the favorites`;
     } catch {
