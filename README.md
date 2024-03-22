@@ -5,6 +5,9 @@
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 
+## Docker image
+- Image of the application [Home-library](https://hub.docker.com/repository/docker/edwardbru/nodejs2024q2-service-app/general)
+
 ## Downloading
 
 ```
@@ -14,13 +17,13 @@ git clone git@github.com:EduardBrukish/nodejs2023Q2-service.git
 ## Go to the project folder
 
 ```
-cd nodejs2023Q2-service
+cd nodejs2024Q2-service
 ```
 
 ## Go to the development branch
 
 ```
-git checkout develop
+git checkout containerization-db
 ```
 
 ## Installing NPM modules
@@ -29,14 +32,36 @@ git checkout develop
 npm install
 ```
 
+## Create .env file in the root folder 
+
+```
+Create .env file or delete extension from .env.example
+```
+
 ## Running application
 
 ```
-npm start
+open Docker Desktop
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+in terminal run command
+```
+docker compose build
+```
+
+after build, run command
+```
+docker compose up
+```
+after container is running, you should migrate the db instances
+in the terminal run command
+
+```
+npm run migrate
+```
+
+After starting the app on port (4000 as default, or check value of the port in the .env file) you can open
+in your browser OpenAPI documentation by typing exmp: http://localhost:4000/api
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
