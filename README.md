@@ -17,7 +17,7 @@ git clone git@github.com:EduardBrukish/nodejs2024Q1-service.git
 ## Go to the project folder
 
 ```
-cd nodejs2024Q2-service
+cd nodejs2024Q1-service
 ```
 
 ## Go to the development branch
